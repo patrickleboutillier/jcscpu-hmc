@@ -1,12 +1,19 @@
 #include "Extension.h"
-#include "ALU.h"
 #include "RAM.h"
+#include "ALU.h"
+#include "CLK.h"
 
 Extension E1(1) ;
 Extension E2(2) ;
+Extension E3(3) ;
+
+
+#define HZ  1
+
 
 RAM RAM(&E1, A0, A1, A2) ;
 ALU ALU(&E2, 12, 11, 10, 9, 5, 4, 3, 2, A0, A1, A2, A3) ;
+CLK CLK(&E3, HZ, 9, 8, 7, 6, 5, 4, 3, 2) ;
 int BUS = 0 ;
 
 

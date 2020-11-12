@@ -3,40 +3,40 @@
 
 
 ALU::ALU(Extension *e, int pin_op2, int pin_op1, int pin_op0, int pin_ci, int pin_c, int pin_a, int pin_e, int pin_z,
-      int pin_TMP_s, int pin_ACC_e, int pin_ACC_s, int pin_BUS1){
-    _e = e ;
-    _TMP = 0 ;
-    _ACC = 0 ;
-    _result = 0 ;
-    
-    _pin_op2 = pin_op2 ;
-    _pin_op1 = pin_op1 ; 
-    _pin_op0 = pin_op0 ; 
-    _pin_ci = pin_ci ; 
-    _pin_c = pin_c ; 
-    _pin_a = pin_a ; 
-    _pin_e = pin_e ; 
-    _pin_z = pin_z ;
-    _pin_TMP_s = pin_TMP_s ;
-    _pin_ACC_e = pin_ACC_e ;
-    _pin_ACC_s = pin_ACC_s ;
-    _pin_BUS1 = pin_BUS1 ;
+    int pin_TMP_s, int pin_ACC_e, int pin_ACC_s, int pin_BUS1){
+  _e = e ;
+  _TMP = 0 ;
+  _ACC = 0 ;
+  _result = 0 ;
+  
+  _pin_op2 = pin_op2 ;
+  _pin_op1 = pin_op1 ; 
+  _pin_op0 = pin_op0 ; 
+  _pin_ci = pin_ci ; 
+  _pin_c = pin_c ; 
+  _pin_a = pin_a ; 
+  _pin_e = pin_e ; 
+  _pin_z = pin_z ;
+  _pin_TMP_s = pin_TMP_s ;
+  _pin_ACC_e = pin_ACC_e ;
+  _pin_ACC_s = pin_ACC_s ;
+  _pin_BUS1 = pin_BUS1 ;
 }
 
 
 void ALU::setup(){
-    _e->pinMode(_pin_op2, INPUT) ;
-    _e->pinMode(_pin_op1, INPUT) ;
-    _e->pinMode(_pin_op0, INPUT) ;
-    _e->pinMode(_pin_ci, INPUT) ;
-    _e->pinMode(_pin_c, OUTPUT) ;
-    _e->pinMode(_pin_a, OUTPUT) ;
-    _e->pinMode(_pin_e, OUTPUT) ;
-    _e->pinMode(_pin_z, OUTPUT) ;
-    _e->pinMode(_pin_TMP_s, INPUT) ;
-    _e->pinMode(_pin_ACC_e, INPUT) ;
-    _e->pinMode(_pin_ACC_s, INPUT) ;
-    _e->pinMode(_pin_BUS1, INPUT) ;
+  _e->pinMode(_pin_op2, INPUT) ;
+  _e->pinMode(_pin_op1, INPUT) ;
+  _e->pinMode(_pin_op0, INPUT) ;
+  _e->pinMode(_pin_ci, INPUT) ;
+  _e->pinMode(_pin_c, OUTPUT) ;
+  _e->pinMode(_pin_a, OUTPUT) ;
+  _e->pinMode(_pin_e, OUTPUT) ;
+  _e->pinMode(_pin_z, OUTPUT) ;
+  _e->pinMode(_pin_TMP_s, INPUT) ;
+  _e->pinMode(_pin_ACC_e, INPUT) ;
+  _e->pinMode(_pin_ACC_s, INPUT) ;
+  _e->pinMode(_pin_BUS1, INPUT) ;
 }
 
 
