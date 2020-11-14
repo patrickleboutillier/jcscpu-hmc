@@ -2,9 +2,10 @@
 #include "ALU.h"
 
 
-ALU::ALU(Extension *e, int pin_op2, int pin_op1, int pin_op0, int pin_ci, int pin_c, int pin_a, int pin_e, int pin_z,
+ALU::ALU(Extension *e, BUS *bus, int pin_op2, int pin_op1, int pin_op0, int pin_ci, int pin_c, int pin_a, int pin_e, int pin_z,
     int pin_TMP_s, int pin_ACC_e, int pin_ACC_s, int pin_BUS1){
   _e = e ;
+  _bus = bus ;
   _TMP = 0 ;
   _ACC = 0 ;
   _result = 0 ;
@@ -40,12 +41,12 @@ void ALU::setup(){
 }
 
 
-int ALU::loop(int bus, bool debug = 0){
+bool ALU::loop(bool debug = 0){
+  byte a = _bus->read() ;
   if (_e->digitalRead(_pin_TMP_s)){
-    _TMP = bus ;
+    _TMP = a ;
   }
 
-  byte a = bus ;
   byte b = _TMP ;
   if (_e->digitalRead(_pin_BUS1)){
     b = 1 ;
@@ -63,15 +64,14 @@ int ALU::loop(int bus, bool debug = 0){
   if (_e->digitalRead(_pin_ACC_s)){
     _ACC = _result ;
   }
-  
+
+  bool be = false ;
   if (_e->digitalRead(_pin_ACC_e)){
-    bus = _ACC ;
-  }
-  else {
-    bus = -1 ;
+    _bus->write(_ACC) ;
+    be = true ;
   }
 
-  return bus ;
+  return be ;
 }
 
 

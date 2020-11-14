@@ -14,7 +14,7 @@ Extension E3(3) ;
 
 BUS BUS(12, 11, 10, 9, 8, 7, 6, 5) ;
 RAM RAM(&BUS, 4, 3, 2) ;
-ALU ALU(&E2, 12, 11, 10, 9, 5, 4, 3, 2, A0, A1, A2, A3) ;
+ALU ALU(&E2, &BUS, 12, 11, 10, 9, 5, 4, 3, 2, A0, A1, A2, A3) ;
 CLK CLK(&E3, HZ, 9, 8, 7, 6, 5, 4, 3, 2) ;
 
 
@@ -30,10 +30,10 @@ void setup(){
 
 
 void loop(){
-  // byte clk = CLK.loop() ;
-
   bool be = false ;
+  CLK.loop(true) ;
   be |= RAM.loop(true) ;
+  be |= ALU.loop(true) ;
   //bus = run_loop(bus, RAM.loop(bus, true)) ;
   //Serial.print("RAM sends to bus: ") ;
   //Serial.println(bus) ;

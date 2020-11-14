@@ -7,8 +7,9 @@ CLK::CLK(Extension *e, int HZ, int pin_CLK_e, int pin_CLK_s, int pin_STEP_1, int
   _e = e ;
   _then = 0 ;
   _qtick = -1 ;
+  _clk_e = 0 ;
+  _clk_s = 0 ;
   _step = 0 ;
-  _state = 0 ;
   _HZ = HZ ;
   
   _pin_CLK_e = pin_CLK_e ;
@@ -34,47 +35,45 @@ void CLK::setup(){
 }
 
 
-byte CLK::loop(bool debug = 0){
+bool CLK::loop(bool debug = 0){
   unsigned long now = millis() ;
   if ((now - _then) >= (1000 / _HZ)){
-    _state = qtick() ;
-    _e->digitalWrite(_pin_CLK_e, _state & 0b10000000) ;
-    _e->digitalWrite(_pin_CLK_s, _state & 0b01000000) ;
-    _e->digitalWrite(_pin_STEP_1, _state & 0b00100000) ;
-    _e->digitalWrite(_pin_STEP_2, _state & 0b00010000) ;
-    _e->digitalWrite(_pin_STEP_3, _state & 0b00001000) ;
-    _e->digitalWrite(_pin_STEP_4, _state & 0b00000100) ;
-    _e->digitalWrite(_pin_STEP_5, _state & 0b00000010) ;
-    _e->digitalWrite(_pin_STEP_6, _state & 0b00000001) ;
+    qtick(debug) ;
+    _e->digitalWrite(_pin_CLK_e, _clk_e) ;
+    _e->digitalWrite(_pin_CLK_s, _clk_s) ;
+    _e->digitalWrite(_pin_STEP_1, (_step == 1)) ;
+    _e->digitalWrite(_pin_STEP_2, (_step == 2)) ;
+    _e->digitalWrite(_pin_STEP_3, (_step == 3)) ;
+    _e->digitalWrite(_pin_STEP_4, (_step == 4)) ;
+    _e->digitalWrite(_pin_STEP_5, (_step == 5)) ;
+    _e->digitalWrite(_pin_STEP_6, (_step == 6)) ;
     _then = now ;
   }
 
-  return _state ;
+  return false ;
 }
 
 
-byte CLK::qtick(){
+void CLK::qtick(bool debug){
   // Update qtick
   _qtick++ ;
 
-  bool clk_e = 0 ;
-  bool clk_s = 0 ;
   switch (_qtick % 4){
     case 0:
-      clk_e = 1 ;
-      clk_s = 0 ;
+      _clk_e = 1 ;
+      _clk_s = 0 ;
       break ;
     case 1:
-      clk_e = 1 ;
-      clk_s = 1 ;
+      _clk_e = 1 ;
+      _clk_s = 1 ;
       break ;
     case 2:
-      clk_e = 1 ;
-      clk_s = 0 ;
+      _clk_e = 1 ;
+      _clk_s = 0 ;
       break ;
     case 3:
-      clk_e = 0 ;
-      clk_s = 0 ;
+      _clk_e = 0 ;
+      _clk_s = 0 ;
       break ;
   }
 
@@ -85,15 +84,13 @@ byte CLK::qtick(){
     }
   }
 
-  return 
-    (clk_e << 7) | 
-    (clk_s << 6) |
-    ((_step == 1) << 5) |
-    ((_step == 2) << 4) |
-    ((_step == 3) << 3) |
-    ((_step == 4) << 2) |
-    ((_step == 5) << 1) |
-    (_step == 6) ;
+  Serial.print("  CLK(clk_e:") ;
+  Serial.print(_clk_e) ;
+  Serial.print(", clk_s:") ;
+  Serial.print(_clk_s) ;
+  Serial.print(", step:") ;
+  Serial.print(_step) ;   
+  Serial.println(")") ;
 }
 
 

@@ -23,7 +23,6 @@ void RAM::setup(){
 
 
 bool RAM::loop(bool debug = 0){
-  bool be = false ;
   if (digitalRead(_pin_MAR_s)){
     _MAR = _bus->read() ;
     if (debug){
@@ -43,7 +42,8 @@ bool RAM::loop(bool debug = 0){
       Serial.println(")") ;
     }
   }
-  
+
+  bool be = false ;
   if (digitalRead(_pin_RAM_e)){
     _bus->write(_RAM[_MAR]) ;
     be = true ;

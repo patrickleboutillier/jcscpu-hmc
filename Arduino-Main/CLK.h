@@ -14,14 +14,15 @@ class CLK {
     CLK(Extension *e, int HZ, int pin_CLK_e, int pin_CLK_s, int pin_STEP_1, int pin_STEP_2, int pin_STEP_3,
       int pin_STEP_4, int pin_STEP_5, int pin_STEP_6) ;
     void setup() ;
-    byte loop(bool debug = 0) ;
+    bool loop(bool debug = 0) ;
   private:
-    byte qtick() ;
+    void qtick(bool debug) ;
     Extension *_e ;
     unsigned long _then ;
     long _qtick ;
+    bool _clk_e ;
+    bool _clk_s ;
     byte _step ;
-    byte _state ;
     int _HZ ;
     int _pin_CLK_e ;
     int _pin_CLK_s ;
