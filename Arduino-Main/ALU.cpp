@@ -40,7 +40,7 @@ void ALU::setup(){
 }
 
 
-int ALU::loop(int bus){
+int ALU::loop(int bus, bool debug = 0){
   if (_e->digitalRead(_pin_TMP_s)){
     _TMP = bus ;
   }
@@ -53,7 +53,7 @@ int ALU::loop(int bus){
 
   byte op = (_e->digitalRead(_pin_op2) << 2) | (_e->digitalRead(_pin_op1) << 1) | _e->digitalRead(_pin_op0) ;
   bool ci = _e->digitalRead(_pin_ci) ;
-  int res = soft_alu(op, a, b, ci) ;
+  int res = soft_alu(op, a, b, ci, debug) ;
   _result = res & 0xFF ;
   _e->digitalWrite(_pin_c, (res >> 11) & 0b0001) ;
   _e->digitalWrite(_pin_a, (res >> 10) & 0b0001) ;
@@ -71,12 +71,11 @@ int ALU::loop(int bus){
     bus = -1 ;
   }
 
-  Serial.println(bus) ;
   return bus ;
 }
 
 
-int ALU::soft_alu(byte op, byte a, byte b, bool ci){
+int ALU::soft_alu(byte op, byte a, byte b, bool ci, bool debug){
   byte c = 0 ;
   byte co = 0 ;
   switch (op){
@@ -122,25 +121,27 @@ int ALU::soft_alu(byte op, byte a, byte b, bool ci){
   bool zero = (c == 0) ;
   bool carry_out = co ;
 
-  Serial.print("  ALU(op:") ;
-  Serial.print(op) ;
-  Serial.print(", a:") ;
-  Serial.print(a) ;
-  Serial.print(", b:") ;
-  Serial.print(b) ;
-  Serial.print(", ci:") ;  
-  Serial.print(ci) ;
-  Serial.print(") = (res:") ;
-  Serial.print(c) ;  
-  Serial.print(", c:") ;
-  Serial.print(carry_out) ; 
-  Serial.print(", a:") ;
-  Serial.print(alarger) ; 
-  Serial.print(", e:") ;
-  Serial.print(eq) ; 
-  Serial.print(", z:") ;
-  Serial.print(zero) ; 
-  Serial.println(")") ;
+  if (debug){
+    Serial.print("  ALU(op:") ;
+    Serial.print(op) ;
+    Serial.print(", a:") ;
+    Serial.print(a) ;
+    Serial.print(", b:") ;
+    Serial.print(b) ;
+    Serial.print(", ci:") ;  
+    Serial.print(ci) ;
+    Serial.print(") = (res:") ;
+    Serial.print(c) ;  
+    Serial.print(", c:") ;
+    Serial.print(carry_out) ; 
+    Serial.print(", a:") ;
+    Serial.print(alarger) ; 
+    Serial.print(", e:") ;
+    Serial.print(eq) ; 
+    Serial.print(", z:") ;
+    Serial.print(zero) ; 
+    Serial.println(")") ;
+  }
   
   return (carry_out << 11) | (alarger << 10) | (eq << 9) | (zero << 8) | c ; 
 } 

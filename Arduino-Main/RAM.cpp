@@ -2,8 +2,8 @@
 #include "RAM.h"
 
 
-RAM::RAM(Extension *e, int pin_MAR_s, int pin_RAM_e, int pin_RAM_s){
-  _e = e ;
+RAM::RAM(BUS *bus, int pin_MAR_s, int pin_RAM_s, int pin_RAM_e){
+  _bus = bus ;
   _MAR = 0 ;
   for (int i = 0 ; i < 255 ; i++){
     _RAM[i] = 0 ;
@@ -16,35 +16,45 @@ RAM::RAM(Extension *e, int pin_MAR_s, int pin_RAM_e, int pin_RAM_s){
 
 
 void RAM::setup(){
-  _e->pinMode(_pin_MAR_s, INPUT) ;
-  _e->pinMode(_pin_RAM_e, INPUT) ;
-  _e->pinMode(_pin_RAM_s, INPUT) ;
+  pinMode(_pin_MAR_s, INPUT) ;
+  pinMode(_pin_RAM_e, INPUT) ;
+  pinMode(_pin_RAM_s, INPUT) ;
 }
 
 
-int RAM::loop(int bus){
-  if (_e->digitalRead(_pin_MAR_s)){
-    _MAR = bus ;
-    Serial.print("  RAM(mar:") ;
-    Serial.print(_MAR) ;
-    Serial.println(")") ;
+bool RAM::loop(bool debug = 0){
+  bool be = false ;
+  if (digitalRead(_pin_MAR_s)){
+    _MAR = _bus->read() ;
+    if (debug){
+      Serial.print("  RAM(op:mar_s, mar:") ;
+      Serial.print(_MAR) ;
+      Serial.println(")") ;
+    }
   }
    
-  if (_e->digitalRead(_pin_RAM_s)){
-    _RAM[_MAR] = bus ;
-    Serial.print("  RAM(mar:") ;
-    Serial.print(_MAR) ;
-    Serial.print(", v:") ;
-    Serial.print(_RAM[_MAR]) ;    
-    Serial.println(")") ;
+  if (digitalRead(_pin_RAM_s)){
+    _RAM[_MAR] = _bus->read() ;
+    if (debug){
+      Serial.print("  RAM(op:ram_s, mar:") ;
+      Serial.print(_MAR) ;
+      Serial.print(", v:") ;
+      Serial.print(_RAM[_MAR]) ;    
+      Serial.println(")") ;
+    }
   }
   
-  if (_e->digitalRead(_pin_RAM_e)){
-    bus = _RAM[_MAR] ;
-  }
-  else {
-    bus = -1 ;
+  if (digitalRead(_pin_RAM_e)){
+    _bus->write(_RAM[_MAR]) ;
+    be = true ;
+    if (debug){
+      Serial.print("  RAM(op:ram_e, mar:") ;
+      Serial.print(_MAR) ;
+      Serial.print(", v:") ;
+      Serial.print(_RAM[_MAR]) ;
+      Serial.println(")") ;
+    }
   }
 
-  return bus ;
+  return be ;
 }

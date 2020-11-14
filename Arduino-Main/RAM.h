@@ -2,16 +2,16 @@
 #define RAM_h
 
 #include "Arduino.h"
-#include "Extension.h"
+#include "BUS.h"
 
 
 class RAM {
   public:
-    RAM(Extension *e, int pin_MAR_s, int pin_RAM_e, int pin_RAM_s) ;
+    RAM(BUS *bus, int pin_MAR_s, int pin_RAM_s, int pin_RAM_e) ;
     void setup() ;
-    int loop(int bus) ;
+    bool loop(bool debug = 0) ;
   private:
-    Extension *_e ;
+    BUS *_bus ;
     byte _MAR ;
     byte _RAM[256] ;
     int _pin_MAR_s ;

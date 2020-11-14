@@ -10,9 +10,10 @@ class ALU {
     ALU(Extension *e, int pin_op2, int pin_op1, int pin_op0, int pin_ci, int pin_c, int pin_a, int pin_e, int pin_z,
       int pin_TMP_s, int pin_ACC_e, int pin_ACC_s, int pin_BUS1) ;
     void setup() ;
-    int loop(int bus) ;
-    int soft_alu(byte op, byte a, byte b, bool ci) ;
+    int loop(int bus, bool debug = 0) ;
   private:
+    int soft_alu(byte op, byte a, byte b, bool ci, bool debug) ;
+    
     Extension *_e ;
     byte _TMP ;
     byte _ACC ;

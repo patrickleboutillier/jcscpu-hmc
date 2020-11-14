@@ -34,7 +34,7 @@ void CLK::setup(){
 }
 
 
-byte CLK::loop(){
+byte CLK::loop(bool debug = 0){
   unsigned long now = millis() ;
   if ((now - _then) >= (1000 / _HZ)){
     _state = qtick() ;
@@ -176,61 +176,6 @@ void loop_CLK(byte slowdown){
       qtick() ;
     }
   }
-}
-
-
-void qtick(){
-  // Update qtick
-  clk_qtick++ ;
-
-  bool clk_e = 0 ;
-  bool clk_s = 0 ;
-  switch (clk_qtick % 4){
-    case 0:
-      clk_e = 1 ;
-      clk_s = 0 ;
-      break ;
-    case 1:
-      clk_e = 1 ;
-      clk_s = 1 ;
-      break ;
-    case 2:
-      clk_e = 1 ;
-      clk_s = 0 ;
-      break ;
-    case 3:
-      clk_e = 0 ;
-      clk_s = 0 ;
-      break ;
-  }
-
-  if ((clk_qtick % 4) == 0){
-    clk_step++ ;
-    if (clk_step == 7){
-      clk_step = 1 ;
-    }
-    //Serial.print("STEP = ") ;
-    //Serial.println(clk_step) ;
-  }
-  
-  digitalWrite(CLKSTP_ENABLE, HIGH) ;
-  digitalWrite(CLKSTP_LATCH, LOW) ;
-  shiftOut(CLKSTP_DATA, CLKSTP_CLOCK, MSBFIRST, 
-    ((clk_step == 1) << 7) |
-    ((clk_step == 2) << 6) |
-    ((clk_step == 3) << 5) |
-    ((clk_step == 4) << 4) |
-    ((clk_step == 5) << 3) |
-    ((clk_step == 6) << 2) |
-    (clk_e << 1) | 
-    clk_s) ;
-  digitalWrite(CLKSTP_LATCH, HIGH) ; 
-  digitalWrite(CLKSTP_ENABLE, LOW) ;
-}
-
-
-long get_qtick(){
-  return clk_qtick ;
 }
 
 
