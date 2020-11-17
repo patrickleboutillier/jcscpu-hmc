@@ -1,0 +1,12 @@
+- Introduction
+- NAND
+- AND, NOT
+- MEMORY, BYTE, ENABLER
+- REGISTER, SN74HC373
+- BUS
+  - tristate
+- RAM, with floppy wires to the CW
+- CONNECT AND PROGRAM ALU ARDUINO (E1)
+- ALU, with FLAG LEDs in the correct place, with floppy wires
+  - No FLAGs REGISTER
+- Comment about floppy wires, bring lines to the CW area and use pull-down resistors

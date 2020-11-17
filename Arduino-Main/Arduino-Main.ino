@@ -9,29 +9,31 @@
 
 
 Extension E1(1) ;
-Extension E2(2) ;
-Extension E3(3) ;
+//Extension E2(2) ;
+//Extension E3(3) ;
 
 BUS BUS(12, 11, 10, 9, 8, 7, 6, 5) ;
 RAM RAM(&BUS, 4, 3, 2) ;
-ALU ALU(&E2, &BUS, 12, 11, 10, 9, 5, 4, 3, 2, A0, A1, A2, A3) ;
-CLK CLK(&E3, HZ, 9, 8, 7, 6, 5, 4, 3, 2) ;
+ALU ALU(&E1, &BUS, A0, A1, A2, 8, 12, 11, 10, 9, 7, 6, 5, 4) ;
+//CLK CLK(&E3, HZ, 9, 8, 7, 6, 5, 4, 3, 2) ;
 
 
 void setup(){
   Serial.begin(9600) ;
+  Serial.println("Waiting for extention Arduinos to powerup...") ;
+  delay(1000) ;
   E1.enableDigitalCache() ;
-  E2.enableDigitalCache() ;
-  E3.enableDigitalCache() ;
+  //E2.enableDigitalCache() ;
+  //E3.enableDigitalCache() ;
   RAM.setup() ;
   ALU.setup() ;
-  CLK.setup() ;
+  //CLK.setup() ;
 }
 
 
 void loop(){
   bool be = false ;
-  CLK.loop(true) ;
+  //CLK.loop(true) ;
   be |= RAM.loop(true) ;
   be |= ALU.loop(true) ;
   //bus = run_loop(bus, RAM.loop(bus, true)) ;

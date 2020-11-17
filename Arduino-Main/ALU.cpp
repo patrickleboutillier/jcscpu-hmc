@@ -3,7 +3,7 @@
 
 
 ALU::ALU(Extension *e, BUS *bus, int pin_op2, int pin_op1, int pin_op0, int pin_ci, int pin_c, int pin_a, int pin_e, int pin_z,
-    int pin_TMP_s, int pin_ACC_e, int pin_ACC_s, int pin_BUS1){
+    int pin_TMP_s, int pin_ACC_s, int pin_ACC_e, int pin_BUS1){
   _e = e ;
   _bus = bus ;
   _TMP = 0 ;
