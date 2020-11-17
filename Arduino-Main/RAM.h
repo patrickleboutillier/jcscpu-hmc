@@ -7,7 +7,7 @@
 
 class RAM {
   public:
-    RAM(BUS *bus, int pin_MAR_s, int pin_RAM_s, int pin_RAM_e) ;
+    RAM(BUS *bus, int pin_MAR_s, int pin_RAM_e, int pin_RAM_s) ;
     void setup() ;
     bool loop(bool debug = 0) ;
   private:

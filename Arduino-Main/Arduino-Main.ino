@@ -5,41 +5,55 @@
 #include "CLK.h"
 
 
+#define RAM_PART
+#define ALU_PART   
+
 #define HZ  4
 
 
-Extension E1(1) ;
-//Extension E2(2) ;
-//Extension E3(3) ;
-
 BUS BUS(12, 11, 10, 9, 8, 7, 6, 5) ;
 RAM RAM(&BUS, 4, 3, 2) ;
-ALU ALU(&E1, &BUS, A0, A1, A2, 8, 12, 11, 10, 9, 7, 6, 5, 4) ;
-//CLK CLK(&E3, HZ, 9, 8, 7, 6, 5, 4, 3, 2) ;
+#ifdef ALU_PART
+  Extension E1(1) ;
+  ALU ALU(&E1, &BUS, A0, A1, A2, 8, 12, 11, 10, 9, 7, 6, 5, 4) ;
+#endif
+#ifdef CLK_PART
+  Extension E2(2) ;
+  CLK CLK(&E2, HZ, 9, 8, 7, 6, 5, 4, 3, 2) ;
+#endif
+// Extension E3(3) ;
 
 
 void setup(){
   Serial.begin(9600) ;
   Serial.println("Waiting for extention Arduinos to powerup...") ;
   delay(1000) ;
-  E1.enableDigitalCache() ;
-  //E2.enableDigitalCache() ;
-  //E3.enableDigitalCache() ;
+
+  // E1.enableDigitalCache() ;
+  // E2.enableDigitalCache() ;
+  // E3.enableDigitalCache() ;
   RAM.setup() ;
-  ALU.setup() ;
-  //CLK.setup() ;
+  #ifdef ALU_PART
+    ALU.setup() ;
+  #endif
+  #ifdef CLK_PART
+    CLK.setup() ;
+  #endif
 }
 
 
 void loop(){
   bool be = false ;
-  //CLK.loop(true) ;
+
+  #ifdef CLK_PART 
+    CLK.loop(true) ;
+  #endif
+  
   be |= RAM.loop(true) ;
-  be |= ALU.loop(true) ;
-  //bus = run_loop(bus, RAM.loop(bus, true)) ;
-  //Serial.print("RAM sends to bus: ") ;
-  //Serial.println(bus) ;
-  //bus = run_loop(bus, ALU.loop(bus)) ;
+  
+  #ifdef ALU_PART  
+    be |= ALU.loop(true) ;
+  #endif
 
   if (! be){
     // No parts are writing to the bus
@@ -48,9 +62,4 @@ void loop(){
  
   Serial.print("BUS = ") ;
   Serial.println(BUS.read()) ;
-}
-
-
-byte run_loop(byte bus, int part){
-  return (part == -1 ? bus : part) ;
 }
