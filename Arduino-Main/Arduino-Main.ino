@@ -6,10 +6,16 @@
 
 
 #define RAM_PART
-#define ALU_PART   
+#define ALU_PART  
+#define CLK_PART
+#define INST_PART 
 
-#define HZ  4
+#define HZ          4
+#define RESET_MS    1000
 
+
+unsigned long STARTED ;
+bool RESET ;
 
 BUS BUS(12, 11, 10, 9, 8, 7, 6, 5) ;
 RAM RAM(&BUS, 4, 3, 2) ;
@@ -19,47 +25,57 @@ RAM RAM(&BUS, 4, 3, 2) ;
 #endif
 #ifdef CLK_PART
   Extension E2(2) ;
-  CLK CLK(&E2, HZ, 9, 8, 7, 6, 5, 4, 3, 2) ;
+  CLK CLK(&E2, HZ, 4, 3, 12, 11, 10, 9, 8, 7, 6, 5) ;
 #endif
-// Extension E3(3) ;
+#ifdef INST_PART
+  // Extension E3(3) ;
+#endif
 
 
 void setup(){
   Serial.begin(9600) ;
-  Serial.println("Waiting for extention Arduinos to powerup...") ;
+  Serial.print("Waiting for extention Arduinos to powerup...") ;
+  Serial.print("ok.") ;
   delay(1000) ;
 
-  // E1.enableDigitalCache() ;
-  // E2.enableDigitalCache() ;
-  // E3.enableDigitalCache() ;
   RAM.setup() ;
   #ifdef ALU_PART
+    E1.enableDigitalCache() ;
     ALU.setup() ;
   #endif
   #ifdef CLK_PART
+    E2.enableDigitalCache() ;
     CLK.setup() ;
   #endif
+  // E3.enableDigitalCache() ;
+  
+  STARTED = millis() ;
+  RESET = true ;
 }
 
 
 void loop(){
-  bool be = false ;
-
-  #ifdef CLK_PART 
-    CLK.loop(true) ;
+  #ifdef CLK_PART
+    CLK.loop(RESET, true) ;
   #endif
-  
+
+  bool be = false ;
   be |= RAM.loop(true) ;
   
   #ifdef ALU_PART  
-    be |= ALU.loop(true) ;
+    be |= ALU.loop(false) ;
   #endif
-
+    
   if (! be){
     // No parts are writing to the bus
     BUS.reset() ;
   }
  
-  Serial.print("BUS = ") ;
-  Serial.println(BUS.read()) ;
+  //Serial.print("BUS = ") ;
+  //Serial.println(BUS.read()) ;
+
+  // Placed here to make sure we pass at least once through the loop during RESET.
+  if ((RESET)&&(millis() > STARTED + RESET_MS)){
+    RESET = false ;
+  }
 }

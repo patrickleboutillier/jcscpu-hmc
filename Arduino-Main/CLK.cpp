@@ -2,7 +2,10 @@
 #include "CLK.h"
 
 
-CLK::CLK(Extension *e, int HZ, int pin_CLK_e, int pin_CLK_s, int pin_STEP_1, int pin_STEP_2, int pin_STEP_3,
+#define DEBOUNCE_DELAY_MS 50
+
+
+CLK::CLK(Extension *e, int HZ, int pin_BUTTON, int pin_WAITING, int pin_CLK_e, int pin_CLK_s, int pin_STEP_1, int pin_STEP_2, int pin_STEP_3,
       int pin_STEP_4, int pin_STEP_5, int pin_STEP_6){
   _e = e ;
   _then = 0 ;
@@ -20,6 +23,28 @@ CLK::CLK(Extension *e, int HZ, int pin_CLK_e, int pin_CLK_s, int pin_STEP_1, int
   _pin_STEP_4 = pin_STEP_4 ;
   _pin_STEP_5 = pin_STEP_5 ;
   _pin_STEP_6 = pin_STEP_6 ;
+  _pin_BUTTON = pin_BUTTON ;
+  _pin_WAITING = pin_WAITING ;
+
+  _mode = CLK_MANUAL ;
+  _button_state = HIGH ;
+  _last_button_state = _button_state ;
+  _last_debounce_time = 0 ;
+}
+
+
+bool CLK::clk_e(){
+  return _clk_e ;
+}
+
+
+bool CLK::clk_s(){
+  return _clk_e ;
+}
+
+
+byte CLK::step(){
+  return _step ;
 }
 
 
@@ -32,29 +57,57 @@ void CLK::setup(){
   _e->pinMode(_pin_STEP_4, OUTPUT) ;
   _e->pinMode(_pin_STEP_5, OUTPUT) ;
   _e->pinMode(_pin_STEP_6, OUTPUT) ;
-}
-
-
-bool CLK::loop(bool debug = 0){
-  unsigned long now = millis() ;
-  if ((now - _then) >= (1000 / _HZ)){
-    qtick(debug) ;
-    _e->digitalWrite(_pin_CLK_e, _clk_e) ;
-    _e->digitalWrite(_pin_CLK_s, _clk_s) ;
-    _e->digitalWrite(_pin_STEP_1, (_step == 1)) ;
-    _e->digitalWrite(_pin_STEP_2, (_step == 2)) ;
-    _e->digitalWrite(_pin_STEP_3, (_step == 3)) ;
-    _e->digitalWrite(_pin_STEP_4, (_step == 4)) ;
-    _e->digitalWrite(_pin_STEP_5, (_step == 5)) ;
-    _e->digitalWrite(_pin_STEP_6, (_step == 6)) ;
-    _then = now ;
+  _e->pinMode(_pin_BUTTON, INPUT) ;
+  _e->pinMode(_pin_WAITING, OUTPUT) ;
+  
+  if (_e->digitalRead(_pin_BUTTON) == HIGH){
+    // Switch mode
+    _mode = !_mode ;
   }
 
-  return false ;
+  if (_mode == CLK_MANUAL){
+    _e->digitalWrite(_pin_WAITING, HIGH) ;
+  }
 }
 
 
-void CLK::qtick(bool debug){
+bool CLK::loop(bool reset, bool debug = 0){
+  bool tick  = false ;
+  
+  if (reset){
+    // Turn on the waiting LED
+    _e->digitalWrite(_pin_WAITING, HIGH) ; 
+  }
+  else {
+    if (_mode == CLK_AUTOMATIC){
+      _e->digitalWrite(_pin_WAITING, LOW) ;
+      unsigned long now = millis() ;
+      if ((now - _then) >= (1000 / _HZ)){
+        tick = qtick(debug) ;
+        _then = now ;
+      }
+    }
+    else {
+      if (button_pressed()){
+        tick = qtick(debug) ;
+      }
+    }
+  }
+
+  _e->digitalWrite(_pin_CLK_e, _clk_e) ;
+  _e->digitalWrite(_pin_CLK_s, _clk_s) ;
+  _e->digitalWrite(_pin_STEP_1, (_step == 1)) ;
+  _e->digitalWrite(_pin_STEP_2, (_step == 2)) ;
+  _e->digitalWrite(_pin_STEP_3, (_step == 3)) ;
+  _e->digitalWrite(_pin_STEP_4, (_step == 4)) ;
+  _e->digitalWrite(_pin_STEP_5, (_step == 5)) ;
+  _e->digitalWrite(_pin_STEP_6, (_step == 6)) ;
+
+  return tick ;
+}
+
+
+bool CLK::qtick(bool debug){
   // Update qtick
   _qtick++ ;
 
@@ -91,6 +144,35 @@ void CLK::qtick(bool debug){
   Serial.print(", step:") ;
   Serial.print(_step) ;   
   Serial.println(")") ;
+
+  return true ;
+}
+
+
+/*
+  Generic debouncing code from https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
+*/
+bool CLK::button_pressed(){
+  bool ret = 0 ;
+  int reading = _e->digitalRead(_pin_BUTTON) ;
+  
+  if (reading != _last_button_state) {
+    _last_debounce_time = millis() ;
+  }
+  
+  if ((millis() - _last_debounce_time) > DEBOUNCE_DELAY_MS){
+    if (reading != _button_state){
+      _button_state = reading ;
+      if (_button_state == HIGH){
+        ret = 1 ;
+      }
+    }
+  }
+
+  // save the reading. Next time through the loop, it'll be the lastButtonState:
+  _last_button_state = reading ;
+   
+  return ret ;
 }
 
 
@@ -103,8 +185,7 @@ byte clk_step ;
 
 bool buttonState ;
 bool lastButtonState ;
-unsigned long lastDebounceTime = 0 ;
-unsigned long debounceDelay = 50 ;
+
 
 
 bool button_pressed(byte button) ;
@@ -127,18 +208,12 @@ void reset_CLK(){
   }
   
   digitalWrite(CLK_WAITING, HIGH) ;  
-  digitalWrite(CLKSTP_ENABLE, HIGH) ; 
 }
 
 
 void setup_CLK(){
   pinMode(CLK_MANUAL, INPUT) ;
   pinMode(CLK_WAITING, OUTPUT) ;
-
-  pinMode(CLKSTP_DATA, OUTPUT) ; 
-  pinMode(CLKSTP_LATCH, OUTPUT) ; 
-  pinMode(CLKSTP_CLOCK, OUTPUT) ; 
-  pinMode(CLKSTP_ENABLE, OUTPUT) ; 
 
   clk_automatic = 1 ;
   if (digitalRead(CLK_MANUAL) == HIGH){
@@ -173,31 +248,6 @@ void loop_CLK(byte slowdown){
       qtick() ;
     }
   }
-}
-
-
-// Generic debouncing code from https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
-bool button_pressed(byte button){
-  bool ret = 0 ;
-  int reading = digitalRead(button) ;
-  
-  if (reading != lastButtonState) {
-    lastDebounceTime = millis() ;
-  }
-  
-  if ((millis() - lastDebounceTime) > debounceDelay){
-    if (reading != buttonState){
-      buttonState = reading ;
-      if (buttonState == HIGH){
-        ret = 1 ;
-      }
-    }
-  }
-
-  // save the reading. Next time through the loop, it'll be the lastButtonState:
-  lastButtonState = reading ;
-   
-  return ret ;
 }
 
 */
