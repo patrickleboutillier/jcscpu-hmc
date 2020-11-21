@@ -21,7 +21,7 @@ my %INSTS = (
     },
     '0010' => { 
         'name' => 'DATA',
-        '4e' => 'BIT1|IAR_e',
+        '4e' => 'BUS1|IAR_e',
         '4s' => 'MAR_s|ACC_s',
         '5e' => 'RAM_e',
         '5s' => 'RegB_s',
@@ -37,7 +37,7 @@ my %INSTS = (
     },
     '0101' => { 
         'name' => 'JCOND',
-        '4e' => 'BIT1|IAR_e',
+        '4e' => 'BUS1|IAR_e',
         '4s' => 'MAR_s|ACC_s',
         '5e' => 'ACC_e',
         '5s' => 'IAR_s',
@@ -54,7 +54,7 @@ my %INSTS = (
     },
     '01100' => { 
         'name' => 'CLF',
-        '4e' => 'BIT1',
+        '4e' => 'BUS1',
         '4s' => 'FLAGS_s',
         skip => sub { if ($_[0] > 0) { return "Invalid instruction"} ; return undef ;},
     },
@@ -77,7 +77,13 @@ my %INSTS = (
     ALU('1111', 'CMP'),
 ) ;
 
+my $now = localtime() ;
 print MICRO <<CPP ;
+/*
+ * Microcode dispatch table.
+ * This file was generated on $now by $0.  
+ */
+
 #ifndef MICROCODE_h
 #define MICROCODE_h
 
@@ -93,9 +99,9 @@ print MICRO <<CPP ;
 #define TMP_s     0b00000000100000000000000000000000
 #define ACC_e     0b00000000010000000000000000000000
 #define ACC_s     0b00000000001000000000000000000000
-#define BIT1      0b00000000000100000000000000000000
-#define FLAG_s    0b00000000000010000000000000000000
-#define Ctmp      0b00000000000001000000000000000000
+#define BUS1      0b00000000000100000000000000000000
+#define FLAGS_s   0b00000000000010000000000000000000
+#define Ctmp_e    0b00000000000001000000000000000000
 #define IAR_e     0b00000000000000100000000000000000
 // #define X      0b00000000000000010000000000000000
 
@@ -121,7 +127,7 @@ print MICRO <<CPP ;
 CPP
 
 my $n = 0 ;
-print MICRO "PROGMEM unsigned long microcode[] = {\n" ;
+print MICRO "PROGMEM const unsigned long microcode[] = {\n" ;
 foreach my $inst (sort keys %INSTS){
     my $arg_len = 8 - length($inst) ;
     my $arg_max = (2 ** $arg_len) - 1 ;
@@ -159,8 +165,8 @@ sub ALU {
             'name' => $name,
             '4e' => 'RegB_e',
             '4s' => 'TMP_s',
-            '5e' => 'RegA_e',
-            '5s' => 'ACC_s',
+            '5e' => 'RegA_e|Ctmp_e',
+            '5s' => 'ACC_s|FLAGS_s',
             '6e' => 'ACC_e',
             '6s' => ($code == '1111' ? '' : 'RegB_s'),
         }

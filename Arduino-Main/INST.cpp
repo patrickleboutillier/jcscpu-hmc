@@ -39,9 +39,14 @@ void INST::setup(){
  */
 unsigned long INST::loop(bool clk_e, bool clk_s, byte step, bool debug){
   unsigned long ret = 0 ;
+
+  if ((! clk_e)&&(! clk_s)){
+    return 0 ;
+  }
+  
   switch (step){
     case 1:
-      ret |= BIT1 ;
+      ret |= BUS1 ;
       ret |= (clk_e ? IAR_e : 0) ;
       ret |= (clk_s ? MAR_s|ACC_s : 0) ;
       break ;
@@ -53,5 +58,30 @@ unsigned long INST::loop(bool clk_e, bool clk_s, byte step, bool debug){
       ret |= (clk_e ? ACC_e : 0) ;
       ret |= (clk_s ? IAR_s : 0) ;
       break ;
+    default:
+      byte inst = read() ;
+      unsigned int addr = (inst * 6) + ((step - 4) * 2) ;
+      if (clk_e){
+        ret |= pgm_read_dword(addr) ;
+      }
+      if (clk_s){
+        ret |= pgm_read_dword(addr + 1) ;
+      }
+      break ;
   }
+
+  return ret ;
+}
+
+
+byte INST::read(){
+  return 
+    (_e->digitalRead(_pin_bit7) << 7) |
+    (_e->digitalRead(_pin_bit6) << 6) |
+    (_e->digitalRead(_pin_bit5) << 5) |
+    (_e->digitalRead(_pin_bit4) << 4) |
+    (_e->digitalRead(_pin_bit3) << 3) |
+    (_e->digitalRead(_pin_bit2) << 2) |
+    (_e->digitalRead(_pin_bit1) << 1) |
+    _e->digitalRead(_pin_bit0) ;
 }

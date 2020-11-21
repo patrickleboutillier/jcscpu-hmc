@@ -12,6 +12,7 @@ class INST {
     void setup() ;
     unsigned long loop(bool clk_e, bool clk_s, byte step, bool debug) ;   
   private:
+    byte read() ;
     Extension *_e ;
     int _pin_bit7 ;
     int _pin_bit6 ;
