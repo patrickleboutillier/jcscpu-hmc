@@ -4,6 +4,7 @@
 #include "ALU.h"
 #include "CLK.h"
 #include "INST.h"
+#include "CW.h"
 
 #define RAM_PART
 #define ALU_PART  
@@ -30,6 +31,7 @@ RAM RAM(&BUS, 4, 3, 2) ;
 #ifdef INST_PART
   Extension E3(3) ;
   INST INST(&E3, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2) ;
+  CW CW(A0, A1, A2) ;
 #endif
 
 
@@ -69,7 +71,9 @@ void loop(){
     be |= ALU.loop(false) ;
   #endif
   #ifdef INST_PART  
-    INST.loop(CLK.clk_e(), CLK.clk_s(), CLK.step(), false) ;
+    unsigned long cw = INST.loop(CLK.clk_e(), CLK.clk_s(), CLK.step(), false) ;
+    // Send cw to the shift registers.
+    CW.loop(cw, false) ;
   #endif
     
   if (! be){
