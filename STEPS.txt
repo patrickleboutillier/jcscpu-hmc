@@ -3,10 +3,38 @@
 - AND, NOT
 - MEMORY, BYTE, ENABLER
 - REGISTER, SN74HC373
+  - Active LOW enable
+
 - BUS
   - tristate
+
 - RAM, with floppy wires to the CW
+
 - CONNECT AND PROGRAM ALU ARDUINO (E1)
 - ALU, with FLAG LEDs in the correct place, with floppy wires
   - No FLAGs REGISTER
-- Comment about floppy wires, bring lines to the CW area and use pull-down resistors
+- Comment about floppy wires
+  - Bring lines to the CW area and use pull-down resistors
+
+- CONNECT R0, R1 with all wires and pull-down resistors
+
+- "Doing something useful"
+
+- CONNECT AND PROGRAM ALU ARDUINO (E2)
+- CLOCK AND STEPPER
+
+- CONNECT R2, R3 with all wires and pull-down resistors
+
+- CONNECT AND PROGRAM INST ARDUINO (E3)
+
+- CONNECT IAR and IR (including IAR_s, explaining RESET)
+
+- Explain hard-wiring vs microcode
+- SHIFT-REGISTERS
+
+- Complete lower-part wiring for missing control signals (FLAGS_s, Ctmp_e, JCOND, IAR_s)
+
+- CONNECT CONTROL WORD
+
+- Finish FLAGS and JCOND circuitry  
+
