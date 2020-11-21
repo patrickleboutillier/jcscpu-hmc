@@ -11,8 +11,9 @@
 #define CLK_PART
 #define INST_PART 
 
-#define HZ          4
-#define RESET_MS    1000
+#define HZ            0
+#define RESET_MS      1000
+#define INIT_WAIT_MS  1000
 
 
 unsigned long STARTED ;
@@ -30,16 +31,16 @@ RAM RAM(&BUS, 4, 3, 2) ;
 #endif
 #ifdef INST_PART
   Extension E3(3) ;
-  INST INST(&E3, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2) ;
+  INST INST(&E3, 12, 11, 10, 9, 8, 7, 6, 5, A3, 3, 2, 4) ;
   CW CW(A0, A1, A2) ;
 #endif
 
 
 void setup(){
   Serial.begin(9600) ;
-  Serial.print("Waiting for extention Arduinos to powerup...") ;
-  Serial.print("ok.") ;
-  delay(1000) ;
+  Serial.print("Waiting for extention Arduinos to power up...") ;
+  Serial.print("done.") ;
+  delay(INIT_WAIT_MS) ;
 
   RAM.setup() ;
   #ifdef ALU_PART
@@ -71,8 +72,9 @@ void loop(){
     be |= ALU.loop(false) ;
   #endif
   #ifdef INST_PART  
-    unsigned long cw = INST.loop(CLK.clk_e(), CLK.clk_s(), CLK.step(), false) ;
+    unsigned long cw = INST.loop(RESET, CLK.clk_e(), CLK.clk_s(), CLK.step(), true) ;
     // Send cw to the shift registers.
+    cw = 0b01000000000000000000100000000000 ;
     CW.loop(cw, false) ;
   #endif
     

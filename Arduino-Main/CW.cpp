@@ -18,9 +18,10 @@ void CW::setup(){
 
 void CW::loop(unsigned long cw, bool debug = 0){
   digitalWrite(_pin_LATCH, LOW) ;
-  shiftOut(_pin_DATA, _pin_CLK, LSBFIRST, cw & 0xFF) ;
-  shiftOut(_pin_DATA, _pin_CLK, LSBFIRST, (cw >> 8) & 0xFF) ;
-  shiftOut(_pin_DATA, _pin_CLK, LSBFIRST, (cw >> 16) & 0xFF) ;
-  shiftOut(_pin_DATA, _pin_CLK, LSBFIRST, (cw >> 24) & 0xFF) ;
+  cw = 7 ;
+  shiftOut(_pin_DATA, _pin_CLK, LSBFIRST, (byte)(cw & 0xFF)) ;
+  //shiftOut(_pin_DATA, _pin_CLK, MSBFIRST, (cw >> 8) & 0xFF) ;
+  //shiftOut(_pin_DATA, _pin_CLK, MSBFIRST, (cw >> 16) & 0xFF) ;
+  //shiftOut(_pin_DATA, _pin_CLK, MSBFIRST, (cw >> 24) & 0xFF) ;
   digitalWrite(_pin_LATCH, HIGH) ; 
 }

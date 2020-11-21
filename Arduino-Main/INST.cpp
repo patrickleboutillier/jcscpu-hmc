@@ -4,7 +4,7 @@
 
 
 INST::INST(Extension *e, int pin_bit7, int pin_bit6, int pin_bit5, int pin_bit4, int pin_bit3, int pin_bit2, int pin_bit1, int pin_bit0,
-    int pin_JCOND, int pin_IAR_s_in, int pin_IAR_s_out){
+    int pin_JCOND, int pin_JINST, int pin_IAR_s_in, int pin_IAR_s_out){
   _e = e ; 
   _pin_bit7 = pin_bit7 ;
   _pin_bit6 = pin_bit6 ;
@@ -15,6 +15,7 @@ INST::INST(Extension *e, int pin_bit7, int pin_bit6, int pin_bit5, int pin_bit4,
   _pin_bit1 = pin_bit1 ;
   _pin_bit0 = pin_bit0 ;
   _pin_JCOND = pin_JCOND ;
+  _pin_JINST = pin_JINST ;
   _pin_IAR_s_in = pin_IAR_s_in ;
   _pin_IAR_s_out = pin_IAR_s_out ;
 }
@@ -29,6 +30,8 @@ void INST::setup(){
   pinMode(_pin_bit2, INPUT) ;
   pinMode(_pin_bit1, INPUT) ;
   pinMode(_pin_bit0, INPUT) ;
+  pinMode(_pin_JCOND, INPUT) ;
+  pinMode(_pin_JINST, INPUT) ;
   pinMode(_pin_IAR_s_in, INPUT) ;
   pinMode(_pin_IAR_s_out, OUTPUT) ;
 }
@@ -37,12 +40,28 @@ void INST::setup(){
 /*
  * Here we will lookup in the microcode table the control word value based on our input and return it
  */
-unsigned long INST::loop(bool clk_e, bool clk_s, byte step, bool debug){
+unsigned long INST::loop(bool reset, bool clk_e, bool clk_s, byte step, bool debug){
+  // First, handle the IAR_s_out signal
+  bool jump = ((_e->digitalRead(_pin_JCOND))&&(_e->digitalRead(_pin_JINST))) ;
+  if ((reset)||(_e->digitalRead(_pin_IAR_s_in))||(jump)){
+    _e->digitalWrite(_pin_IAR_s_out, HIGH) ;
+  }
+  else {
+    _e->digitalWrite(_pin_IAR_s_out, LOW) ;
+  }
+  
+  // Now take care of the Control Word.
   unsigned long ret = 0 ;
-
   if ((! clk_e)&&(! clk_s)){
     return 0 ;
   }
+
+  Serial.print("  INST(step:") ;
+  Serial.print(step) ;
+  Serial.print(", clk_e:") ;
+  Serial.print(clk_e) ;
+  Serial.print(", clk_s:") ;
+  Serial.print(clk_s) ;
   
   switch (step){
     case 1:
@@ -60,17 +79,43 @@ unsigned long INST::loop(bool clk_e, bool clk_s, byte step, bool debug){
       break ;
     default:
       byte inst = read() ;
+      Serial.print(", inst:") ;
+      Serial.print(inst, BIN) ;
       unsigned int addr = (inst * 6) + ((step - 4) * 2) ;
+      Serial.print(", addr=") ;
+      Serial.print(addr) ;
       if (clk_e){
-        ret |= pgm_read_dword(addr) ;
+        ret |= pgm_read_dword(microcode + addr) ;
       }
       if (clk_s){
-        ret |= pgm_read_dword(addr + 1) ;
+        ret |= pgm_read_dword(microcode + (addr + 1)) ;
       }
       break ;
   }
+  
 
+  Serial.print(", cw=") ;
+  Serial.print(print_cw(ret)) ;
+  Serial.println(")") ;
+  
   return ret ;
+}
+
+
+char *INST::print_cw(unsigned long cw){
+  static char buf[40] ;
+
+  byte dashes = 0 ;
+  for (byte i = 0 ; i < 32 ; i++){
+    if ((i == 8)||(i == 16)||(i == 24)){
+      buf[i+dashes] = '-' ;
+      dashes++ ;
+    }
+    buf[i+dashes] = '0' + ((cw >> (31-i)) & 1) ;
+  }
+  buf[32+dashes] = '\0' ;
+   
+  return buf ;
 }
 
 

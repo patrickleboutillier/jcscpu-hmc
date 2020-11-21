@@ -26,8 +26,8 @@ CLK::CLK(Extension *e, int HZ, int pin_BUTTON, int pin_WAITING, int pin_CLK_e, i
   _pin_BUTTON = pin_BUTTON ;
   _pin_WAITING = pin_WAITING ;
 
-  _mode = CLK_MANUAL ;
-  _button_state = HIGH ;
+  _mode = (!HZ ? CLK_MANUAL : CLK_AUTOMATIC) ;
+  _button_state = (_mode == CLK_MANUAL ? HIGH : LOW) ;
   _last_button_state = _button_state ;
   _last_debounce_time = 0 ;
 }
@@ -39,7 +39,7 @@ bool CLK::clk_e(){
 
 
 bool CLK::clk_s(){
-  return _clk_e ;
+  return _clk_s ;
 }
 
 
