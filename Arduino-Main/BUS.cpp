@@ -8,7 +8,7 @@ BUS::BUS(int pin_bit7, int pin_bit6, int pin_bit5, int pin_bit4, int pin_bit3, i
   _pin_bit7 = pin_bit7 ;
   _pin_bit6 = pin_bit6 ;
   _pin_bit5 = pin_bit5 ;
-  _pin_bit4 = pin_bit4;
+  _pin_bit4 = pin_bit4 ;
   _pin_bit3 = pin_bit3 ;
   _pin_bit2 = pin_bit2 ;
   _pin_bit1 = pin_bit1 ;

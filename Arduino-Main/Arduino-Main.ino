@@ -3,7 +3,7 @@
 #include "RAM.h"
 #include "ALU.h"
 #include "CLK.h"
-
+#include "INST.h"
 
 #define RAM_PART
 #define ALU_PART  
@@ -28,7 +28,8 @@ RAM RAM(&BUS, 4, 3, 2) ;
   CLK CLK(&E2, HZ, 4, 3, 12, 11, 10, 9, 8, 7, 6, 5) ;
 #endif
 #ifdef INST_PART
-  // Extension E3(3) ;
+  Extension E3(3) ;
+  INST INST(&E3, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2) ;
 #endif
 
 
@@ -47,7 +48,9 @@ void setup(){
     E2.enableDigitalCache() ;
     CLK.setup() ;
   #endif
-  // E3.enableDigitalCache() ;
+  #ifdef INST_PART
+    E3.enableDigitalCache() ;
+  #endif
   
   STARTED = millis() ;
   RESET = true ;
@@ -64,6 +67,9 @@ void loop(){
   
   #ifdef ALU_PART  
     be |= ALU.loop(false) ;
+  #endif
+  #ifdef INST_PART  
+    INST.loop(CLK.clk_e(), CLK.clk_s(), CLK.step(), false) ;
   #endif
     
   if (! be){
