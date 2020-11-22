@@ -14,7 +14,7 @@
 #define ALU_DEBUG     0
 #define RAM_DEBUG     0
 #define CLK_DEBUG     0
-#define INST_DEBUG    0
+#define INST_DEBUG    1
 #define CW_DEBUG      1
 
 #define HZ            0
@@ -46,7 +46,7 @@ RAM RAM(&BUS, 4, 3, 2) ;
 void setup(){
   Serial.begin(9600) ;
   Serial.print("Waiting for extention Arduinos to power up...") ;
-  Serial.print("done.") ;
+  Serial.println("done.") ;
   delay(INIT_WAIT_MS) ;
 
   RAM.setup() ;

@@ -23,13 +23,13 @@ void CW::loop(bool reset, unsigned long cw, bool debug = 0){
     cw = 0 ;
   }
   
-  if (cw == _cache){
-    return ;
-  }
+  //if (cw == _cache){
+  //  return ;
+  //}
   
   digitalWrite(_pin_LATCH, LOW) ;
 
-  if (debug){
+  if ((debug)&&(cw != _cache)){
     Serial.print("  CW(cw:") ;
     Serial.print(print_cw(cw)) ;
     Serial.println(")") ;
@@ -38,8 +38,8 @@ void CW::loop(bool reset, unsigned long cw, bool debug = 0){
   shiftOut(_pin_DATA, _pin_CLK, LSBFIRST, (byte)(cw & 0xFF)) ;
   shiftOut(_pin_DATA, _pin_CLK, LSBFIRST, (byte)((cw >> 8) & 0xFF)) ;
   shiftOut(_pin_DATA, _pin_CLK, LSBFIRST, (byte)((cw >> 16) & 0xFF)) ;
-  byte b = (byte)((cw >> 24) & 0xFF) ;
-  shiftOut(_pin_DATA, _pin_CLK, LSBFIRST, b) ;
+  shiftOut(_pin_DATA, _pin_CLK, LSBFIRST, (byte)((cw >> 24) & 0xFF)) ;
+  
   digitalWrite(_pin_LATCH, HIGH) ;
   _cache = cw ; 
 }

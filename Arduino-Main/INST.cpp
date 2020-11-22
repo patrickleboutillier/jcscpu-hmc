@@ -18,6 +18,7 @@ INST::INST(Extension *e, int pin_bit7, int pin_bit6, int pin_bit5, int pin_bit4,
   _pin_JINST = pin_JINST ;
   _pin_IAR_s_in = pin_IAR_s_in ;
   _pin_IAR_s_out = pin_IAR_s_out ;
+  _cache = -1 ;
 }
 
 
@@ -52,56 +53,54 @@ unsigned long INST::loop(bool reset, bool clk_e, bool clk_s, byte step, bool deb
   
   // Now take care of the Control Word.
   unsigned long ret = 0 ;
-  if ((! clk_e)&&(! clk_s)){
-    return 0 ;
+  int inst = -1 ;
+  unsigned int addr = 0 ;   
+  if ((clk_e)||(clk_s)){
+    switch (step){
+      case 1:
+        ret |= BUS1 ;
+        ret |= (clk_e ? IAR_e : 0) ;
+        ret |= (clk_s ? MAR_s|ACC_s : 0) ;
+        break ;
+      case 2:
+        ret |= (clk_e ? RAM_e : 0) ;
+        ret |= (clk_s ? IR_s : 0) ;
+        break ;
+     case 3:
+        ret |= (clk_e ? ACC_e : 0) ;
+        ret |= (clk_s ? IAR_s : 0) ;
+        break ;
+      default:
+        inst = read() ;
+        addr = (((byte)inst) * 6) + ((step - 4) * 2) ;
+        if (clk_e){
+          ret |= pgm_read_dword(microcode + addr) ;
+        }
+        if (clk_s){
+          ret |= pgm_read_dword(microcode + (addr + 1)) ;
+        }
+        break ;
+    }
   }
 
-  if (debug){
+  if ((debug)&&(ret != _cache)){
     Serial.print("  INST(step:") ;
     Serial.print(step) ;
     Serial.print(", clk_e:") ;
     Serial.print(clk_e) ;
     Serial.print(", clk_s:") ;
     Serial.print(clk_s) ;
-  }
-  
-  switch (step){
-    case 1:
-      ret |= BUS1 ;
-      ret |= (clk_e ? IAR_e : 0) ;
-      ret |= (clk_s ? MAR_s|ACC_s : 0) ;
-      break ;
-    case 2:
-      ret |= (clk_e ? RAM_e : 0) ;
-      ret |= (clk_s ? IR_s : 0) ;
-      break ;
-   case 3:
-      ret |= (clk_e ? ACC_e : 0) ;
-      ret |= (clk_s ? IAR_s : 0) ;
-      break ;
-    default:
-      byte inst = read() ;
-      unsigned int addr = (inst * 6) + ((step - 4) * 2) ;
-      if (debug){
-        Serial.print(", inst:") ;
-        Serial.print(inst, BIN) ;
-        Serial.print(", addr=") ;
-        Serial.print(addr) ;
-      }
-      if (clk_e){
-        ret |= pgm_read_dword(microcode + addr) ;
-      }
-      if (clk_s){
-        ret |= pgm_read_dword(microcode + (addr + 1)) ;
-      }
-      break ;
-  }
-  
-  if (debug){ 
+    if (inst != -1){
+      Serial.print(", inst:") ;
+      Serial.print(inst, BIN) ;
+      Serial.print(", addr=") ;
+      Serial.print(addr) ;
+    }
     Serial.print(", cw=") ;
     Serial.print(print_cw(ret)) ;
     Serial.println(")") ;
   }
+  _cache = ret ; 
   
   return ret ;
 }

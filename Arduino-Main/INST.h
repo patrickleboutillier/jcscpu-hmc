@@ -16,7 +16,7 @@ class INST {
     unsigned long loop(bool reset, bool clk_e, bool clk_s, byte step, bool debug) ;   
   private:
     byte read() ;
-
+    unsigned long _cache ;
     Extension *_e ;
     int _pin_bit7 ;
     int _pin_bit6 ;
