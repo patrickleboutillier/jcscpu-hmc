@@ -11,6 +11,12 @@
 #define CLK_PART
 #define INST_PART 
 
+#define ALU_DEBUG     0
+#define RAM_DEBUG     0
+#define CLK_DEBUG     0
+#define INST_DEBUG    0
+#define CW_DEBUG      1
+
 #define HZ            0
 #define RESET_MS      1000
 #define INIT_WAIT_MS  1000
@@ -18,6 +24,7 @@
 
 unsigned long STARTED ;
 bool RESET ;
+bool HALTED ;
 
 BUS BUS(12, 11, 10, 9, 8, 7, 6, 5) ;
 RAM RAM(&BUS, 4, 3, 2) ;
@@ -53,29 +60,35 @@ void setup(){
   #endif
   #ifdef INST_PART
     E3.enableDigitalCache() ;
+    INST.setup() ;
+    CW.setup() ;
   #endif
   
   STARTED = millis() ;
   RESET = true ;
+  HALTED = false ;
 }
 
 
 void loop(){
+  if (HALTED){
+    return ;
+  }
+  
   #ifdef CLK_PART
-    CLK.loop(RESET, true) ;
+    CLK.loop(RESET, CLK_DEBUG) ;
   #endif
 
   bool be = false ;
-  be |= RAM.loop(true) ;
+  be |= RAM.loop(RAM_DEBUG) ;
   
   #ifdef ALU_PART  
-    be |= ALU.loop(false) ;
+    be |= ALU.loop(ALU_DEBUG) ;
   #endif
   #ifdef INST_PART  
-    unsigned long cw = INST.loop(RESET, CLK.clk_e(), CLK.clk_s(), CLK.step(), true) ;
+    unsigned long cw = INST.loop(RESET, CLK.clk_e(), CLK.clk_s(), CLK.step(), INST_DEBUG) ;
     // Send cw to the shift registers.
-    cw = 0b01000000000000000000100000000000 ;
-    CW.loop(cw, false) ;
+    CW.loop(RESET, cw, CW_DEBUG) ;
   #endif
     
   if (! be){
@@ -83,9 +96,6 @@ void loop(){
     BUS.reset() ;
   }
  
-  //Serial.print("BUS = ") ;
-  //Serial.println(BUS.read()) ;
-
   // Placed here to make sure we pass at least once through the loop during RESET.
   if ((RESET)&&(millis() > STARTED + RESET_MS)){
     RESET = false ;

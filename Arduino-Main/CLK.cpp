@@ -137,13 +137,15 @@ bool CLK::qtick(bool debug){
     }
   }
 
-  Serial.print("  CLK(clk_e:") ;
-  Serial.print(_clk_e) ;
-  Serial.print(", clk_s:") ;
-  Serial.print(_clk_s) ;
-  Serial.print(", step:") ;
-  Serial.print(_step) ;   
-  Serial.println(")") ;
+  if (debug){
+    Serial.print("  CLK(clk_e:") ;
+    Serial.print(_clk_e) ;
+    Serial.print(", clk_s:") ;
+    Serial.print(_clk_s) ;
+    Serial.print(", step:") ;
+    Serial.print(_step) ;   
+    Serial.println(")") ;
+  }
 
   return true ;
 }

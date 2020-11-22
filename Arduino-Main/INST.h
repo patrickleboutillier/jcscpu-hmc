@@ -5,6 +5,9 @@
 #include "Extension.h"
 
 
+char *print_cw(unsigned long cw) ;
+
+
 class INST {
   public:
     INST(Extension *e, int pin_bit7, int pin_bit6, int pin_bit5, int pin_bit4, int pin_bit3, int pin_bit2, int pin_bit1, int pin_bit0, 
@@ -13,7 +16,7 @@ class INST {
     unsigned long loop(bool reset, bool clk_e, bool clk_s, byte step, bool debug) ;   
   private:
     byte read() ;
-    char *print_cw(unsigned long cw) ;
+
     Extension *_e ;
     int _pin_bit7 ;
     int _pin_bit6 ;

@@ -22,18 +22,18 @@ INST::INST(Extension *e, int pin_bit7, int pin_bit6, int pin_bit5, int pin_bit4,
 
 
 void INST::setup(){
-  pinMode(_pin_bit7, INPUT) ;
-  pinMode(_pin_bit6, INPUT) ;
-  pinMode(_pin_bit5, INPUT) ;
-  pinMode(_pin_bit4, INPUT) ;
-  pinMode(_pin_bit3, INPUT) ;
-  pinMode(_pin_bit2, INPUT) ;
-  pinMode(_pin_bit1, INPUT) ;
-  pinMode(_pin_bit0, INPUT) ;
-  pinMode(_pin_JCOND, INPUT) ;
-  pinMode(_pin_JINST, INPUT) ;
-  pinMode(_pin_IAR_s_in, INPUT) ;
-  pinMode(_pin_IAR_s_out, OUTPUT) ;
+  _e->pinMode(_pin_bit7, INPUT) ;
+  _e->pinMode(_pin_bit6, INPUT) ;
+  _e->pinMode(_pin_bit5, INPUT) ;
+  _e->pinMode(_pin_bit4, INPUT) ;
+  _e->pinMode(_pin_bit3, INPUT) ;
+  _e->pinMode(_pin_bit2, INPUT) ;
+  _e->pinMode(_pin_bit1, INPUT) ;
+  _e->pinMode(_pin_bit0, INPUT) ;
+  _e->pinMode(_pin_JCOND, INPUT) ;
+  _e->pinMode(_pin_JINST, INPUT) ;
+  _e->pinMode(_pin_IAR_s_in, INPUT) ;
+  _e->pinMode(_pin_IAR_s_out, OUTPUT) ;
 }
 
 
@@ -56,12 +56,14 @@ unsigned long INST::loop(bool reset, bool clk_e, bool clk_s, byte step, bool deb
     return 0 ;
   }
 
-  Serial.print("  INST(step:") ;
-  Serial.print(step) ;
-  Serial.print(", clk_e:") ;
-  Serial.print(clk_e) ;
-  Serial.print(", clk_s:") ;
-  Serial.print(clk_s) ;
+  if (debug){
+    Serial.print("  INST(step:") ;
+    Serial.print(step) ;
+    Serial.print(", clk_e:") ;
+    Serial.print(clk_e) ;
+    Serial.print(", clk_s:") ;
+    Serial.print(clk_s) ;
+  }
   
   switch (step){
     case 1:
@@ -79,11 +81,13 @@ unsigned long INST::loop(bool reset, bool clk_e, bool clk_s, byte step, bool deb
       break ;
     default:
       byte inst = read() ;
-      Serial.print(", inst:") ;
-      Serial.print(inst, BIN) ;
       unsigned int addr = (inst * 6) + ((step - 4) * 2) ;
-      Serial.print(", addr=") ;
-      Serial.print(addr) ;
+      if (debug){
+        Serial.print(", inst:") ;
+        Serial.print(inst, BIN) ;
+        Serial.print(", addr=") ;
+        Serial.print(addr) ;
+      }
       if (clk_e){
         ret |= pgm_read_dword(microcode + addr) ;
       }
@@ -93,29 +97,13 @@ unsigned long INST::loop(bool reset, bool clk_e, bool clk_s, byte step, bool deb
       break ;
   }
   
-
-  Serial.print(", cw=") ;
-  Serial.print(print_cw(ret)) ;
-  Serial.println(")") ;
+  if (debug){ 
+    Serial.print(", cw=") ;
+    Serial.print(print_cw(ret)) ;
+    Serial.println(")") ;
+  }
   
   return ret ;
-}
-
-
-char *INST::print_cw(unsigned long cw){
-  static char buf[40] ;
-
-  byte dashes = 0 ;
-  for (byte i = 0 ; i < 32 ; i++){
-    if ((i == 8)||(i == 16)||(i == 24)){
-      buf[i+dashes] = '-' ;
-      dashes++ ;
-    }
-    buf[i+dashes] = '0' + ((cw >> (31-i)) & 1) ;
-  }
-  buf[32+dashes] = '\0' ;
-   
-  return buf ;
 }
 
 
@@ -129,4 +117,21 @@ byte INST::read(){
     (_e->digitalRead(_pin_bit2) << 2) |
     (_e->digitalRead(_pin_bit1) << 1) |
     _e->digitalRead(_pin_bit0) ;
+}
+
+
+char *print_cw(unsigned long cw){
+  static char buf[40] ;
+
+  byte dashes = 0 ;
+  for (byte i = 0 ; i < 32 ; i++){
+    if ((i == 8)||(i == 16)||(i == 24)){
+      buf[i+dashes] = '-' ;
+      dashes++ ;
+    }
+    buf[i+dashes] = '0' + ((cw >> (31-i)) & 1) ;
+  }
+  buf[32+dashes] = '\0' ;
+   
+  return buf ;
 }
