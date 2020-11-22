@@ -45,8 +45,8 @@ RAM RAM(&BUS, 4, 3, 2) ;
 
 void setup(){
   Serial.begin(9600) ;
-  Serial.print("Waiting for extention Arduinos to power up...") ;
-  Serial.println("done.") ;
+  Serial.println("SYSTEM: Waiting for extention Arduinos to power up...") ;
+  Serial.println("SYSTEM: Wait done.") ;
   delay(INIT_WAIT_MS) ;
 
   RAM.setup() ;
@@ -63,7 +63,8 @@ void setup(){
     INST.setup() ;
     CW.setup() ;
   #endif
-  
+
+  Serial.println("SYSTEM: Starting power-on reset...") ;
   STARTED = millis() ;
   RESET = true ;
   HALTED = false ;
@@ -99,5 +100,6 @@ void loop(){
   // Placed here to make sure we pass at least once through the loop during RESET.
   if ((RESET)&&(millis() > STARTED + RESET_MS)){
     RESET = false ;
+    Serial.println("SYSTEM: Reset done.") ;
   }
 }

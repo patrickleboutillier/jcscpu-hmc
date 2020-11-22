@@ -90,14 +90,14 @@ unsigned long INST::loop(bool reset, bool clk_e, bool clk_s, byte step, bool deb
     Serial.print(clk_e) ;
     Serial.print(", clk_s:") ;
     Serial.print(clk_s) ;
+    Serial.print(", cw=") ;
+    Serial.print(print_cw(ret)) ;
     if (inst != -1){
       Serial.print(", inst:") ;
       Serial.print(inst, BIN) ;
       Serial.print(", addr=") ;
       Serial.print(addr) ;
     }
-    Serial.print(", cw=") ;
-    Serial.print(print_cw(ret)) ;
     Serial.println(")") ;
   }
   _cache = ret ; 
