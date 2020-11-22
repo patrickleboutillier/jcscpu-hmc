@@ -2,13 +2,16 @@
 #include "RAM.h"
 
 
-RAM::RAM(BUS *bus, int pin_MAR_s, int pin_RAM_e, int pin_RAM_s){
+RAM::RAM(BUS *bus, void *program, int pin_MAR_s, int pin_RAM_e, int pin_RAM_s){
   _bus = bus ;
   _MAR = 0 ;
   for (int i = 0 ; i < 255 ; i++){
     _RAM[i] = 0 ;
   }
-
+  if (program != NULL){
+    
+  }
+  
   _pin_MAR_s = pin_MAR_s ;
   _pin_RAM_e = pin_RAM_e ;
   _pin_RAM_s = pin_RAM_s ;
