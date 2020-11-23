@@ -17,6 +17,7 @@ IO::IO(Extension *e, BUS *bus, int pin_IO_s, int pin_IO_e, int pin_IO_io, int pi
   _pin_IO_io = pin_IO_io ; 
   _pin_IO_da = pin_IO_da ; 
   _cur_dev = 0 ;
+  _cache = 0 ;
 }
 
 
@@ -29,28 +30,52 @@ void IO::setup(){
 
 
 bool IO::loop(bool debug = 0){
+  bool ve = _e->digitalRead(_pin_IO_e) ;
+  bool vs = _e->digitalRead(_pin_IO_e) ;
+  bool vio = _e->digitalRead(_pin_IO_e) ;
+  bool vda = _e->digitalRead(_pin_IO_e) ;
+
+  // IO modules cannot be constantly evaluating. They must react only when these indicators change.
   bool be = false ;
-
-  if (_e->digitalRead(_pin_IO_e)){
-    if (_e->digitalRead(_pin_IO_io) == LOW){ // INPUT
-      if (_e->digitalRead(_pin_IO_da) == LOW){ // DATA
-        byte b = produce_byte() ;
-        _bus->write(b) ;
-        be = true ;
+  byte state = (ve << 3) | (vs << 2) | (vio << 1) | vda ;
+  if (state != _cache){    
+    if (ve){
+      if (vio == LOW){ // INPUT
+        if (vda == LOW){ // DATA
+          byte b = produce_byte() ;
+          _bus->write(b) ;
+          be = true ;
+        }
       }
     }
-  }
-
-  if (_e->digitalRead(_pin_IO_s)){
-    if (_e->digitalRead(_pin_IO_io) == HIGH){ // OUTPUT
-      if (_e->digitalRead(_pin_IO_da) == LOW){ // DATA
-        byte b = _bus->read() ;
-        consume_byte(b) ;
-      }
-      else { // ADDR
-        _cur_dev = _bus->read() ;
+  
+    if (vs){
+      if (vio == HIGH){ // OUTPUT
+        if (vda == LOW){ // DATA
+          byte b = _bus->read() ;
+          consume_byte(b) ;
+        }
+        else { // ADDR
+          _cur_dev = _bus->read() ;
+        }
       }
     }
+
+    if (debug){
+      Serial.print("  IO(io_s:") ;
+      Serial.print(vs) ;
+      Serial.print(", io_e:") ;
+      Serial.print(ve) ;
+      Serial.print(", io_io:") ;
+      Serial.print(vio) ;
+      Serial.print(", io_da:") ;  
+      Serial.print(vda) ; 
+      Serial.print(", cur_dev:") ;  
+      Serial.print(_cur_dev) ; 
+      Serial.println(")") ;
+    }
+    
+    _cache = state ;
   }
  
   return be ;

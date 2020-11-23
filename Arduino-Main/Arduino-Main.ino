@@ -111,7 +111,7 @@ void loop(){
     CW.loop(RESET, cw, CW_DEBUG) ;
   }
   if (CLK_IO_PRESENT){
-    IO.loop(IO_DEBUG) ;
+    be |= IO.loop(IO_DEBUG) ;
   }
       
   if (! be){

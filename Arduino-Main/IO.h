@@ -13,6 +13,7 @@ class IO {
   private:
     byte produce_byte() ;
     void consume_byte(byte b) ;
+    byte _cache ;
     Extension *_e ;
     BUS *_bus ;
     int _pin_IO_s ;
