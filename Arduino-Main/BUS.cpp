@@ -71,6 +71,7 @@ void BUS::write(byte b){
     pinMode(_pin_bit3, OUTPUT) ;
     pinMode(_pin_bit2, OUTPUT) ;
     pinMode(_pin_bit1, OUTPUT) ;
+    pinMode(_pin_bit0, OUTPUT) ;
     _enabled = true ;
   }
 

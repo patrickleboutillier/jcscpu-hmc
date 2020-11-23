@@ -8,6 +8,8 @@ CW::CW(int pin_DATA, int pin_LATCH, int pin_CLK){
   _pin_LATCH = pin_LATCH ;
   _pin_CLK = pin_CLK ;
   _cache = -1 ;
+  // Turn off the LEDs for the control word as early as possible...
+  setup() ;
 }
 
 
@@ -15,6 +17,8 @@ void CW::setup(){
   pinMode(_pin_DATA, OUTPUT) ;
   pinMode(_pin_LATCH, OUTPUT) ;
   pinMode(_pin_CLK, OUTPUT) ;
+
+  loop(true, 0, false) ;
 }
 
 

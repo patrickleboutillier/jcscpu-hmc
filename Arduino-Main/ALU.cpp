@@ -47,11 +47,17 @@ bool ALU::loop(bool debug = 0){
     _TMP = a ;
   }
 
+  if (debug){
+    Serial.print("  ALU(TMP:") ;
+    Serial.print(_TMP) ;
+    Serial.println(")") ;
+  }
+  
   byte b = _TMP ;
   if (_e->digitalRead(_pin_BUS1)){
     b = 1 ;
   }
-
+    
   byte op = (_e->digitalRead(_pin_op2) << 2) | (_e->digitalRead(_pin_op1) << 1) | _e->digitalRead(_pin_op0) ;
   bool ci = _e->digitalRead(_pin_ci) ;
   int res = soft_alu(op, a, b, ci, debug) ;
@@ -71,6 +77,12 @@ bool ALU::loop(bool debug = 0){
     be = true ;
   }
 
+  if (debug){
+    Serial.print("  ALU(ACC:") ;
+    Serial.print(_ACC) ;
+    Serial.println(")") ;
+  }
+  
   return be ;
 }
 

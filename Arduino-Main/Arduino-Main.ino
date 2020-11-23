@@ -5,6 +5,7 @@
 #include "CLK.h"
 #include "INST.h"
 #include "CW.h"
+#include "IO.h"
 #include "PROGRAMS.h"
 
 
@@ -13,6 +14,7 @@
 #define CLK_DEBUG     0
 #define INST_DEBUG    1
 #define CW_DEBUG      1
+#define IO_DEBUG      1
 
 #define HZ            0
 #define RESET_MS      1000
@@ -20,26 +22,28 @@
 
 #define PROGRAM       prog42
 
+
 unsigned long STARTED = false;
 bool RESET = true ;
 bool HALTED = false ;
 
 bool ALU_PRESENT = false ;
 bool CLK_IO_PRESENT = false ;
-bool INST_CW_PRESENT = false ;
+bool INST_PRESENT = false ;
 
+CW CW(A0, A1, A2) ;
 BUS BUS(12, 11, 10, 9, 8, 7, 6, 5) ;
 RAM RAM(&BUS, PROGRAM, 4, 3, 2) ;
 Extension E1(1, "ALU") ;
 ALU ALU(&E1, &BUS, A0, A1, A2, 8, 12, 11, 10, 9, 7, 6, 5, 4) ;
 Extension E2(2, "CLK & IO") ;
 CLK CLK(&E2, HZ, 4, 3, 12, 11, 10, 9, 8, 7, 6, 5) ;
+IO IO(&E2, &BUS, A0, A1, A2, A3) ;
 Extension E3(3, "INST & CW") ;
 INST INST(&E3, 12, 11, 10, 9, 8, 7, 6, 5, A3, 3, 2, 4) ;
-CW CW(A0, A1, A2) ;
 
 
-void setup(){
+void setup(){  
   Serial.begin(9600) ;
   Serial.println(F("SYSTEM: Waiting for extention Arduinos to power up...")) ;
   Serial.println(F("SYSTEM: Wait done.")) ;
@@ -59,7 +63,7 @@ void setup(){
         Serial.print(F("SYSTEM: Extension responsible for ")) ;
         Serial.print(E3.name()) ;
         Serial.println(F(" found.")) ;
-        INST_CW_PRESENT = true ;
+        INST_PRESENT = true ;
       }
     }
   }
@@ -72,11 +76,11 @@ void setup(){
   if (CLK_IO_PRESENT){
     E2.enableDigitalCache() ;
     CLK.setup() ;
+    IO.setup() ;
   }
-  if (INST_CW_PRESENT){
+  if (INST_PRESENT){
     E3.enableDigitalCache() ;
     INST.setup() ;
-    CW.setup() ;
   }
 
   Serial.println(F("SYSTEM: Starting power-on reset...")) ;
@@ -101,12 +105,15 @@ void loop(){
   if (ALU_PRESENT){  
     be |= ALU.loop(ALU_DEBUG) ;
   }
-  if (INST_CW_PRESENT){  
+  if (INST_PRESENT){  
     unsigned long cw = INST.loop(RESET, CLK.clk_e(), CLK.clk_s(), CLK.step(), INST_DEBUG) ;
     // Send cw to the shift registers.
     CW.loop(RESET, cw, CW_DEBUG) ;
   }
-    
+  if (CLK_IO_PRESENT){
+    IO.loop(IO_DEBUG) ;
+  }
+      
   if (! be){
     // No parts are writing to the bus
     BUS.reset() ;

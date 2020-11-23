@@ -9,7 +9,8 @@ RAM::RAM(BUS *bus, void *program, int pin_MAR_s, int pin_RAM_e, int pin_RAM_s){
     _RAM[i] = 0 ;
   }
   if (program != NULL){
-    
+    // Here we copy more than the length of the program, but it doesn't matter.
+    memcpy_P(_RAM, program, 256) ;
   }
   
   _pin_MAR_s = pin_MAR_s ;
