@@ -63,9 +63,33 @@ my %INSTS = (
         '4e' => 'HLT',
         skip => sub { if ($_[0] > 0) { return "Invalid instruction"} ; return undef ;},
     },
-    '0111' => { 
+    '011100' => { 
         'name' => 'IO',
-        skip => sub { if ($_[0] >= 0) { return "Not implemented"} ; return undef ;},
+        '4e' => '',
+        '4s' => '',
+        '5e' => 'IO_e',
+        '5s' => 'RegB_s',
+    },   
+    '011101' => { 
+        'name' => 'IO',
+        '4e' => 'IO_da',
+        '4s' => 'IO_da',
+        '5e' => 'IO_e|IO_da',
+        '5s' => 'RegB_s|IO_da',
+    },
+    '011110' => { 
+        'name' => 'IO',
+        '4e' => 'RegB_e|IO_io',
+        '4s' => 'IO_s|IO_io',
+        '5e' => 'IO_io',
+        '5s' => 'IO_io',
+    },
+    '011111' => { 
+        'name' => 'IO',
+        '4e' => 'RegB_e|IO_io|IO_da',
+        '4s' => 'IO_s|IO_io|IO_da',
+        '5e' => 'IO_io|IO_da',
+        '5s' => 'IO_io|IO_da',
     },
     ALU('1000', 'ADD'),
     ALU('1001', 'SHR'),
@@ -107,8 +131,8 @@ print MICRO <<CPP ;
 
 #define IO_s      0b00000000000000001000000000000000
 #define IO_e      0b00000000000000000100000000000000
-#define IO_d      0b00000000000000000010000000000000
-#define IO_a      0b00000000000000000001000000000000
+#define IO_io     0b00000000000000000010000000000000
+#define IO_da     0b00000000000000000001000000000000
 #define R0_e      0b00000000000000000000100000000000
 #define R1_e      0b00000000000000000000010000000000
 #define R0_s      0b00000000000000000000001000000000
@@ -144,8 +168,8 @@ foreach my $inst (sort keys %INSTS){
                         $bits = 0 ;
                     }
                 }
-                $bits =~ s/RegA/RegAB('A', $arg)/e ;
-                $bits =~ s/RegB/RegAB('B', $arg)/e ;
+                $bits =~ s/RegA(_[es])/RegAB('A', $arg) . "$1"/e ;
+                $bits =~ s/RegB(_[es])/RegAB('B', $arg) . "$1"/e ;
                 printf MICRO "  /* Entry %4d (inst*6+((step-4)*2)+clk) -> %5s:$inst$binarg\@$step$clk $info */    ", $n, $INSTS{$inst}->{name} ;
                 print MICRO "$bits,\n" ;
                 $n++ ;

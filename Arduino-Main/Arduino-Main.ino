@@ -9,6 +9,7 @@
 #include "PROGRAMS.h"
 
 
+#define DEBUG_ON      0
 #define ALU_DEBUG     0
 #define RAM_DEBUG     0
 #define CLK_DEBUG     0
@@ -16,7 +17,7 @@
 #define CW_DEBUG      1
 #define IO_DEBUG      1
 
-#define HZ            0
+#define HZ            16
 #define RESET_MS      1000
 #define INIT_WAIT_MS  1000
 
@@ -41,6 +42,7 @@ CLK CLK(&E2, HZ, 4, 3, 12, 11, 10, 9, 8, 7, 6, 5) ;
 IO IO(&E2, &BUS, A0, A1, A2, A3) ;
 Extension E3(3, "INST & CW") ;
 INST INST(&E3, 12, 11, 10, 9, 8, 7, 6, 5, A3, 3, 2, 4) ;
+int pin_HLT = A3 ;
 
 
 void setup(){  
@@ -86,6 +88,8 @@ void setup(){
   Serial.println(F("SYSTEM: Starting power-on reset...")) ;
   STARTED = millis() ;
   RESET = true ;
+  
+  pinMode(pin_HLT, INPUT) ;
   HALTED = false ;
 }
 
@@ -96,22 +100,27 @@ void loop(){
   }
   
   if (CLK_IO_PRESENT){
-    CLK.loop(RESET, CLK_DEBUG) ;
+    CLK.loop(RESET, DEBUG_ON & CLK_DEBUG) ;
   }
 
   bool be = false ;
-  be |= RAM.loop(RAM_DEBUG) ;
+  be |= RAM.loop(DEBUG_ON & RAM_DEBUG) ;
   
   if (ALU_PRESENT){  
-    be |= ALU.loop(ALU_DEBUG) ;
+    be |= ALU.loop(DEBUG_ON & ALU_DEBUG) ;
   }
   if (INST_PRESENT){  
-    unsigned long cw = INST.loop(RESET, CLK.clk_e(), CLK.clk_s(), CLK.step(), INST_DEBUG) ;
+    unsigned long cw = INST.loop(RESET, CLK.clk_e(), CLK.clk_s(), CLK.step(), DEBUG_ON & INST_DEBUG) ;
     // Send cw to the shift registers.
-    CW.loop(RESET, cw, CW_DEBUG) ;
+    CW.loop(RESET, cw, DEBUG_ON & CW_DEBUG) ;
   }
   if (CLK_IO_PRESENT){
-    be |= IO.loop(IO_DEBUG) ;
+    be |= IO.loop(DEBUG_ON & IO_DEBUG) ;
+  }
+  
+  if (digitalRead(pin_HLT) == HIGH){
+    Serial.println(F("SYSTEM: Halted.")) ;
+    HALTED  = true ;
   }
       
   if (! be){

@@ -31,9 +31,9 @@ void IO::setup(){
 
 bool IO::loop(bool debug = 0){
   bool ve = _e->digitalRead(_pin_IO_e) ;
-  bool vs = _e->digitalRead(_pin_IO_e) ;
-  bool vio = _e->digitalRead(_pin_IO_e) ;
-  bool vda = _e->digitalRead(_pin_IO_e) ;
+  bool vs = _e->digitalRead(_pin_IO_s) ;
+  bool vio = _e->digitalRead(_pin_IO_io) ;
+  bool vda = _e->digitalRead(_pin_IO_da) ;
 
   // IO modules cannot be constantly evaluating. They must react only when these indicators change.
   bool be = false ;
@@ -105,7 +105,7 @@ void IO::consume_byte(byte b){
       Serial.print((char)b) ;
       break ;
     case TTY_NUM:
-      Serial.print(b) ;
+      Serial.println(b) ;
       break ;
     case RNG:
       // Do nothing, RNG is output-only.
