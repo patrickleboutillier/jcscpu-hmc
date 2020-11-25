@@ -91,7 +91,9 @@ byte IO::produce_byte(){
   switch (_cur_dev){
     case TTY:
     case TTY_NUM:
-      // Do nothing, TTYs are input only.
+      if (Serial.available()){
+        ret = Serial.read() ;
+      }
       break ;
     case RNG:
       // Return a random byte
