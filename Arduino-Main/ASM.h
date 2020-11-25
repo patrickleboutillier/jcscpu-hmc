@@ -12,8 +12,8 @@ typedef enum Reg { R0 = 0, R1 = 1, R2 = 2, R3 = 3 } ;
 
 // ALU instructions
 #define ADD(ra, rb)       (B10000000 | (ra << 2) | rb)
-#define SHL(ra, rb)       (B10010000 | (ra << 2) | rb)
-#define SHR(ra, rb)       (B10100000 | (ra << 2) | rb)
+#define SHR(ra, rb)       (B10010000 | (ra << 2) | rb)
+#define SHL(ra, rb)       (B10100000 | (ra << 2) | rb)
 #define NOT(ra, rb)       (B10110000 | (ra << 2) | rb)
 #define AND(ra, rb)       (B11000000 | (ra << 2) | rb)
 #define OR(ra, rb)        (B11010000 | (ra << 2) | rb)

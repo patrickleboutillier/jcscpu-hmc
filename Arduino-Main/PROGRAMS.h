@@ -4,6 +4,21 @@
 #include "ASM.h"
 
 
+PROGMEM const byte progjc[] = {
+  DATA(R0, 200),
+  DATA(R1, 200),
+  CLF,
+  ADD(R0, R1),
+  JC(9),
+  HALT,
+  DATA(R0, 0),
+  OUTA(R0),
+  DATA(R1, 74),
+  OUTD(R1),
+  HALT
+} ;
+
+
 PROGMEM const byte prog42[] = {
   DATA(R0, 20),
   DATA(R1, 22),
@@ -15,8 +30,8 @@ PROGMEM const byte prog42[] = {
   HALT
 } ;
 
-/*
-byte insts5x5[] = {
+
+PROGMEM const byte prog5x5[] = {
   DATA(R0, 5),
   DATA(R1, 5),
   DATA(R3, 1),
@@ -32,8 +47,6 @@ byte insts5x5[] = {
   SHL(R3, R3),
   JC(22),
   JMP(7),
-  DATA(R3, 100),
-  ST(R3, R2),
   DATA(R0, 1),
   OUTA(R0),
   OUTD(R2),
@@ -41,7 +54,7 @@ byte insts5x5[] = {
 } ;
 
 
-byte insts10print[] = {
+PROGMEM const byte prog10print[] = {
   DATA(R0, 2),
   OUTA(R0),
   IND(R0),
@@ -58,6 +71,5 @@ byte insts10print[] = {
   HALT
 } ;
 
-*/
 
 #endif

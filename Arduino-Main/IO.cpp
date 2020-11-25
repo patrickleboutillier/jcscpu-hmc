@@ -17,6 +17,7 @@ IO::IO(Extension *e, BUS *bus, int pin_IO_s, int pin_IO_e, int pin_IO_io, int pi
   _pin_IO_io = pin_IO_io ; 
   _pin_IO_da = pin_IO_da ; 
   _cur_dev = 0 ;
+  _be_cache = false ;
   _cache = 0 ;
 }
 
@@ -36,9 +37,10 @@ bool IO::loop(bool debug = 0){
   bool vda = _e->digitalRead(_pin_IO_da) ;
 
   // IO modules cannot be constantly evaluating. They must react only when these indicators change.
-  bool be = false ;
+  bool be = _be_cache ;
   byte state = (ve << 3) | (vs << 2) | (vio << 1) | vda ;
-  if (state != _cache){    
+  if (state != _cache){ 
+    be = false ;   
     if (ve){
       if (vio == LOW){ // INPUT
         if (vda == LOW){ // DATA
@@ -76,6 +78,7 @@ bool IO::loop(bool debug = 0){
     }
     
     _cache = state ;
+    _be_cache = be ;
   }
  
   return be ;

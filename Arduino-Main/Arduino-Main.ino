@@ -9,22 +9,24 @@
 #include "PROGRAMS.h"
 
 
-#define DEBUG_ON      0
-#define ALU_DEBUG     0
-#define RAM_DEBUG     0
-#define CLK_DEBUG     0
-#define INST_DEBUG    1
-#define CW_DEBUG      1
-#define IO_DEBUG      1
+#define PROGRAM       prog5x5     // The name of the program to run. See PROGRAMS.h
 
-#define HZ            16
-#define RESET_MS      1000
-#define INIT_WAIT_MS  1000
-
-#define PROGRAM       prog42
+#define HZ            64          // Clock speed in HZ (1 step/sec = 4, 1 inst/sec = 24, max is about 53). Use 0 for manual clock.
 
 
-unsigned long STARTED = false;
+#define DEBUG_ON      0           // Global debug flag. Must be set to 1 for any debug info to show up.
+#define ALU_DEBUG     0           // Turn on ALU debug info.
+#define RAM_DEBUG     0           // Turn on RAM debug info.
+#define CLK_DEBUG     0           // Turn on CLK debug info.
+#define INST_DEBUG    0           // Turn on INST debug info.
+#define CW_DEBUG      0           // Turn on CW debug info.
+#define IO_DEBUG      1           // Turn on IO debug info.
+
+#define RESET_MS      1000        // Reset signal duration.
+#define INIT_WAIT_MS  1000        // Initial wait period after power-on.
+
+
+unsigned long STARTED = 0 ;
 bool RESET = true ;
 bool HALTED = false ;
 
@@ -119,12 +121,14 @@ void loop(){
   }
   
   if (digitalRead(pin_HLT) == HIGH){
-    Serial.println(F("SYSTEM: Halted.")) ;
+    Serial.print(F("SYSTEM: Halted after ")) ;
+    Serial.print(millis() - STARTED) ;
+    Serial.println(F("ms.")) ;
     HALTED  = true ;
   }
       
   if (! be){
-    // No parts are writing to the bus
+    // No parts are writing to the bus, we reset it.
     BUS.reset() ;
   }
  

@@ -184,14 +184,20 @@ sub ALU {
     my $code = shift ;
     my $name = shift ;
 
+    my $bin = oct("0b$code") ;
+    my $ALU = '' ;
+    $ALU .= "ALU2|" if $bin & 0b100 ;
+    $ALU .= "ALU1|" if $bin & 0b010 ;
+    $ALU .= "ALU0|" if $bin & 0b001 ;
+
     return (
         $code => { 
             'name' => $name,
-            '4e' => 'RegB_e',
-            '4s' => 'TMP_s',
-            '5e' => 'RegA_e|Ctmp_e',
-            '5s' => 'ACC_s|FLAGS_s',
-            '6e' => 'ACC_e',
+            '4e' => $ALU . 'RegB_e',
+            '4s' => $ALU . 'TMP_s',
+            '5e' => $ALU . 'RegA_e|Ctmp_e',
+            '5s' => $ALU . 'ACC_s|FLAGS_s',
+            '6e' => $ALU . 'ACC_e',
             '6s' => ($code == '1111' ? '' : 'RegB_s'),
         }
     ) ;
