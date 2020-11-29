@@ -1,0 +1,36 @@
+my $nl = VAR(10) ;
+my $max = VAR(255) ;
+my $g = VAR() ;
+my $min = VAR(0) ;
+
+WHILE(VAR(1), sub {
+	REM "guess"  ;
+	my $t = MINUS($max, $min) ;
+	DATA R1, $$t ;
+	LD R1, R0 ;
+	SHR R0, R0 ;
+	ST R1, R0 ;
+	PLUS($min, $t, $g) ;
+	PRINT_NUM($g) ;
+	PRINT_CHAR(VAR(ord('?'))) ;
+	PRINT_CHAR($nl) ;
+
+	REM "Get char" ;
+	my $zero = VAR(0) ;
+	my $c = VAR(0) ;
+	WHILE(EQ($c, $zero), sub {
+		GET_CHAR($c) ;
+	}) ;
+	REM "Check char" ;
+	IF(EQ($c, VAR(ord('h'))), sub {
+		COPY($g, $min) ;
+	}) ;
+	IF(EQ($c, VAR(ord('l'))), sub {
+		COPY($g, $max) ;
+	}) ;
+	IF(EQ($c, VAR(ord('='))), sub {
+		PRINT_CHAR(VAR(ord('!'))) ;
+		PRINT_CHAR($nl) ;
+		HALT ;
+	}) ;
+}) ;

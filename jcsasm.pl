@@ -1,6 +1,7 @@
 use strict ;
 
 
+my $DATAADDR = 255 ;
 my $PRINT = 1 ;
 my @LINES = () ;
 my %LABELS = () ;
@@ -19,6 +20,11 @@ END {
 $SIG{__DIE__} = sub {
     $PRINT = 0 ;
 } ;
+
+
+sub nb_lines {
+    return scalar(@LINES) - $NB_REM ;
+}
 
 
 sub done {
@@ -64,8 +70,6 @@ sub add_inst {
 		($inst ? sprintf("%-15s ", $inst) : '') .
 		$comment ;
 }
-
-
 
 
 sub R0() {
@@ -291,6 +295,205 @@ sub RNG(){
 }
 
 
+sub VAR(;$) {
+    my $value = undef ;
+    ($value) = _check_proto("A", @_) if scalar(@_) ;
+
+    my $addr = $DATAADDR-- ;
+    croak("Data segment overlapped code segment!!!") if ($DATAADDR <= nb_lines()) ;
+    my $this = \$addr ;
+
+    if (defined($value)){
+        SET($this, $value) ;
+    }
+
+    return bless($this, "V") ;
+}
+
+
+sub SET($$){
+    my ($var, $value) = _check_proto("VA", @_) ;
+
+    DATA R0, $value ;
+    DATA R1, $$var ; 
+    ST R1, R0 ;
+}
+
+
+sub COPY($$){
+    my ($vara, $varb) = _check_proto("VV", @_) ;
+
+    DATA R0, $$vara ;
+    LD R0, R0 ;
+    DATA R1, $$varb ;
+    ST R1, R0 ;
+}
+
+
+sub EQ($$) {
+    my ($vara, $varb) = _check_proto("VV", @_) ;
+
+    DATA R0, $$vara ;
+    LD R0, R0 ;
+    DATA R1, $$varb ;
+    LD R1, R1 ;
+    DATA R2, 1 ;
+    CMP R0, R1 ;
+    my $eq = "EQ" . nb_lines() ;
+    JE "\@$eq" ;
+    XOR R2, R2 ;
+    LABEL $eq ;
+
+    my $ret = VAR() ;
+    DATA R0, $$ret ;
+    ST R0, R2 ;
+
+    return $ret ;
+}
+
+
+sub GT($$) {
+    my ($vara, $varb) = _check_proto("VV", @_) ;
+
+    DATA R0, $$vara ;
+    LD R0, R0 ;
+    DATA R1, $$varb ;
+    LD R1, R1 ;
+    DATA R2, 1 ;
+    CMP R0, R1 ;
+    my $gt = "GT" . nb_lines() ;
+    JA "\@$gt" ;
+    XOR R2, R2 ;
+    LABEL $gt ;
+
+    my $ret = VAR() ;
+    DATA R0, $$ret ;
+    ST R0, R2 ;
+
+    return $ret ;
+}
+
+
+sub PLUS($$;$) {
+    my ($vara, $varb) = _check_proto("VV", @_) ;
+    shift ; shift ;
+    my $varc = undef ;
+    ($varc) = _check_proto("V", @_) if (scalar(@_)) ;
+
+    DATA R0, $$vara ;
+    LD R0, R0 ;
+    DATA R1, $$varb ;
+    LD R1, R1 ;
+    CLF ;
+    ADD R0, R1 ;
+
+    my $dest = $varc ;
+    $dest = VAR() unless defined($dest) ;
+    DATA R0, $$dest ;
+    ST R0, R1 ;
+
+    return $dest ;
+}
+
+
+sub MINUS($$;$) {
+    my ($vara, $varb, $varc) = _check_proto("VV", @_) ;
+    shift ; shift ;
+    my $varc = undef ;
+    ($varc) = _check_proto("V", @_) if (scalar(@_)) ;
+
+    DATA R0, $$vara ;
+    LD R0, R0 ;
+    DATA R1, $$varb ;
+    LD R1, R1 ;
+    NOT R1, R1 ;
+    DATA R2, 1 ; 
+    CLF ;
+    ADD R2, R1 ;
+    CLF ;
+    ADD R0, R1 ;
+
+    my $dest = $varc ;
+    $dest = VAR() unless defined($dest) ;
+    DATA R0, $$dest ;
+    ST R0, R1 ;
+
+    return $dest ;
+}
+
+
+sub IF($&;&){
+    my ($var, $blkif, $blkelse) = _check_proto("VBB", @_) ;
+
+    # Put $var in R0
+    DATA R0, $$var ;
+    LD R0, R0 ; 
+    # z flag will be set if R0 == 0
+    OR R0, R0 ;  
+
+    my $fi = "FI" . nb_lines() ; 
+    my $else = "ELSE" . nb_lines() ; 
+    JZ ($blkelse ? "\@$else" : "\@$fi") ;
+    $blkif->() ;
+	if ($blkelse){
+    	GOTO $fi ;
+    	LABEL $else ;
+    	$blkelse->() ;
+	}
+    LABEL $fi ;
+}
+
+
+sub WHILE($&) {
+    my $var = shift ;
+    my $block = shift ;
+
+    my $while = "WHILE" . nb_lines() ;
+    my $elihw = "ELIHW" . nb_lines() ;
+    LABEL $while ;
+    IF $var, sub {
+        $block->() ;
+    }, sub {
+        GOTO $elihw ;
+    } ;
+    GOTO $while ;
+    LABEL $elihw ;
+}
+
+
+
+sub PRINT_CHAR($){
+    my ($var) = _check_proto("V", @_) ;
+
+    DATA R0, $$var ;
+    LD R0, R0 ; 
+    XOR R1, R1 ;
+    OUTA R1 ;
+    OUTD R0 ;
+}
+
+
+sub PRINT_NUM($){
+    my ($var) = _check_proto("V", @_) ;
+
+    DATA R0, $$var ;
+    LD R0, R0 ; 
+    XOR R1, R1 ;
+    OUTA R1 ;
+    OUTD R0 ;
+}
+
+
+sub GET_CHAR($){
+    my ($var) = _check_proto("V", @_) ;
+    XOR R0, R0 ;
+	OUTA R0 ;
+	IND R0 ;
+    DATA R1, $$var ;
+    ST R1, R0 ;
+}
+
+
 sub _check_proto {
     my $proto = shift ;
     my @args = @_ ;
@@ -312,8 +515,14 @@ sub _check_proto {
                 $arg = $argn ;
             }
         }     
+        if (($ps[$j] eq "V")&&(ref($arg) != "V")){
+            $ok = 0 ;
+        }
+        if (($ps[$j] eq "B")&&(ref($arg) != "CODE")){
+            $ok = 0 ;
+        }     
 
-        croak("JCSASM: Invalid syntax") unless $ok ;
+        die("JCSASM: Invalid syntax") unless $ok ;
         push @newargs, $arg ; 
     }
 
@@ -379,3 +588,35 @@ sub _reg_byte {
 
 eval join("", (scalar(@ARGV) ? <> : <STDIN>)) ;
 die "$@\n" if $@ ;
+
+
+__DATA__
+
+
+
+
+
+
+
+
+
+sub NEQ($$) {
+    my ($vara, $varb) = _check_proto("VV", @_) ;
+
+    DATA R0, $$vara ;
+    LD R0, R0 ;
+    DATA R1, $$varb ;
+    LD R1, R1 ;
+    XOR R0, R1 ;
+    my $ret = VAR() ;
+    DATA R0, $$ret ;
+    ST R0, R1 ;
+
+    return $ret ;
+}
+
+
+
+
+
+1 ;
