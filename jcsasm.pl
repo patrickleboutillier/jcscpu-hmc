@@ -1,3 +1,4 @@
+#!/usr/bin/perl 
 use strict ;
 
 
@@ -10,7 +11,8 @@ my $NB_REM = 0 ;
 
 END {
 	if ($PRINT){
-		print "PROGMEM const byte prog[] = {\n" ;
+		my $name = $ARGV[0] || 'prog' ;
+		print "PROGMEM const byte ${name}[] = {\n" ;
     	print join("\n", grep { $_ !~ /SKIP_PRINT/ } @{done()})  ;
 		print "\n} ;\n"  ;
 	}
@@ -586,7 +588,7 @@ sub _reg_byte {
 }
 
 
-eval join("", (scalar(@ARGV) ? <> : <STDIN>)) ;
+eval join("", <STDIN>) ;
 die "$@\n" if $@ ;
 
 

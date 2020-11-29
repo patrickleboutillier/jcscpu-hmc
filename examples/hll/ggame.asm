@@ -1,4 +1,4 @@
-PROGMEM const byte prog[] = {
+PROGMEM const byte progggamehll[] = {
   /* addr   0 */ DATA(R0, 10),   // (00001010)
   /* addr   2 */ DATA(R1, 255),  // (11111111)
   /* addr   4 */ ST(R1, R0),     
