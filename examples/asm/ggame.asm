@@ -66,4 +66,6 @@ DATA R0, 0 ; # TTY
 OUTA R0 ;
 DATA R0, 63 ; # ?
 OUTD R0 ;
+DATA R0, 32 ; # ' '
+OUTD R0 ;
 JMP '@TRY_RETURN' ;
