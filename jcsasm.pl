@@ -478,7 +478,7 @@ sub PRINT_NUM($){
 
     DATA R0, $$var ;
     LD R0, R0 ; 
-    XOR R1, R1 ;
+    DATA R1, 1 ;
     OUTA R1 ;
     OUTD R0 ;
 }
