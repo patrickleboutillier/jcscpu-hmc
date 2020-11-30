@@ -1,5 +1,6 @@
 #!/usr/bin/perl 
 use strict ;
+use Carp ;
 
 
 my $DATAADDR = 255 ;
@@ -446,14 +447,14 @@ sub IF($&;&){
 }
 
 
-sub WHILE($&) {
-    my $var = shift ;
+sub WHILE(&&) {
+    my $cond = shift ;
     my $block = shift ;
 
     my $while = "WHILE" . nb_lines() ;
     my $elihw = "ELIHW" . nb_lines() ;
     LABEL $while ;
-    IF $var, sub {
+    IF $cond->(), sub {
         $block->() ;
     }, sub {
         GOTO $elihw ;
@@ -524,7 +525,7 @@ sub _check_proto {
             $ok = 0 ;
         }     
 
-        die("JCSASM: Invalid syntax") unless $ok ;
+        croak("JCSASM: Invalid syntax ($ps[$j] => $arg)") unless $ok ;
         push @newargs, $arg ; 
     }
 
