@@ -5,7 +5,8 @@
 // Device ids
 #define TTY           0
 #define TTY_NUM       1
-#define RNG           2
+#define TTY_NUM_T     2
+#define RNG           5
 
 
 IO::IO(Extension *e, BUS *bus, int pin_IO_s, int pin_IO_e, int pin_IO_io, int pin_IO_da){
@@ -91,6 +92,7 @@ byte IO::produce_byte(){
   switch (_cur_dev){
     case TTY:
     case TTY_NUM:
+    case TTY_NUM_T:
       if (Serial.available()){
         ret = Serial.read() ;
       }
@@ -115,100 +117,10 @@ void IO::consume_byte(byte b){
     case RNG:
       // Do nothing, RNG is output-only.
       break ;
-  }
-}
-
-/* 
-
-// Device das
-#define TTY           0
-#define TTY_NUM       1
-#define RNG           2
-
-
-// Control pins
-#define IO_e      9
-#define IO_s     12
-#define IO_io  10
-#define IO_da  11
-
-
-void loop(){
-  byte cur_IO_e = digitalRead(IO_e) ;
-    if (cur_IO_e){
-      if (digitalRead(IO_io) == LOW){ // INPUT
-        if (digitalRead(IO_da) == LOW){ // DATA
-          byte b = get_output() ;
-        }
-      }
-    }
-    else {
-      digitalWrite(ENABLE_OUT, HIGH) ;
-    }
-    prev_IO_e = cur_IO_e ;
-  }
-
-  byte cur_IO_s = digitalRead(IO_s) ;
-  if (cur_IO_s != prev_IO_s){
-    if (cur_IO_s){
-      if (digitalRead(IO_io) == HIGH){ // OUTPUT
-        if (digitalRead(IO_da) == LOW){ // DATA
-          digitalWrite(CLOCK_IN, HIGH) ;
-          digitalWrite(LATCH_IN, HIGH) ;
-          byte b = shiftIn(DATA_IN, CLOCK_IN, MSBFIRST) ;
-          digitalWrite(LATCH_IN, LOW) ;
-          Serial.print("Read from bus:") ;
-          Serial.println(b) ;
-          dispatch_input(b) ;
-        }
-        else { // ADDR
-          digitalWrite(CLOCK_IN, HIGH) ;
-          digitalWrite(LATCH_IN, HIGH) ;
-          cur_dev = shiftIn(DATA_IN, CLOCK_IN, MSBFIRST) ;
-          digitalWrite(LATCH_IN, LOW) ;
-          Serial.print("Cur dev set to:") ;
-          Serial.println(cur_dev) ;
-        }
-      }
-    }
-  }
-}
-
-
-void dispatch_input(byte b){
-  switch (cur_dev){
-    case TTY:
-      tty_put(b) ;
-      // Print the char on the LCD
-      break ;
-    case TTY_NUM:
-      char s[8] ;
-      sprintf(s, "%d", b) ;
-      for (byte i = 0 ; i < strlen(s) ; i++){
-        tty_put(s[i]) ;
-      }
-      break ;
-    case RNG:
-      // Do nothing, RNG is output-only.
+    case TTY_NUM_T:
+      char buf[8] ;
+      sprintf(buf, "%4d", b) ;
+      Serial.print(buf) ;
       break ;
   }
 }
-
-
-byte get_output(){
-  byte ret = 0 ;
-
-  switch (cur_dev){
-    case TTY:
-    case TTY_NUM:
-      // Do nothing, TTYs are input only.
-      break ;
-    case RNG:
-      // Return a random byte
-      ret = random(256) ;
-  }
-
-  return ret ;
-}
-
-*/

@@ -279,6 +279,64 @@ PROGMEM const byte prog42[] = {
 } ;
 
 
+PROGMEM const byte progsquares[] = {
+  /* addr   0 */ DATA(R2, 0),    // (00000000)
+  /* addr   2 */ ST(R2, R2),
+  /* addr   3 */ DATA(R0, 1),    // (00000001)
+  /* addr   5 */ // Label 'do'
+  /* addr   5 */ DATA(R2, 0),    // (00000000)
+  /* addr   7 */ CLF,
+  /* addr   8 */ ADD(R0, R2),
+  /* addr   9 */ DATA(R3, 0),    // (00000000)
+  /* addr  11 */ CLF,
+  /* addr  12 */ ADD(R0, R3),
+  /* addr  13 */ XOR(R1, R1),
+  /* addr  14 */ // Label 'loop'
+  /* addr  14 */ CLF,
+  /* addr  15 */ SHR(R2, R2),
+  /* addr  16 */ JC(20),         // (@add)
+  /* addr  18 */ JMP(24),        // (@pass)
+  /* addr  20 */ // Label 'add'
+  /* addr  20 */ CLF,
+  /* addr  21 */ ADD(R3, R1),
+  /* addr  22 */ JMP(27),        // (@next)
+  /* addr  24 */ // Label 'pass'
+  /* addr  24 */ JZ(30),         // (@diff)
+  /* addr  26 */ CLF,
+  /* addr  27 */ // Label 'next'
+  /* addr  27 */ SHL(R3, R3),
+  /* addr  28 */ JMP(14),        // (@loop)
+  /* addr  30 */ // Label 'diff'
+  /* addr  30 */ DATA(R3, 0),    // (00000000)
+  /* addr  32 */ LD(R3, R2),
+  /* addr  33 */ ST(R3, R1),
+  /* addr  34 */ NOT(R2, R2),
+  /* addr  35 */ DATA(R3, 1),    // (00000001)
+  /* addr  37 */ CLF,
+  /* addr  38 */ ADD(R3, R2),
+  /* addr  39 */ CLF,
+  /* addr  40 */ ADD(R1, R2),
+  /* addr  41 */ DATA(R3, 2),    // (00000011)
+  /* addr  43 */ OUTA(R3),
+  /* addr  44 */ OUTD(R0),
+  /* addr  45 */ OUTD(R1),
+  /* addr  46 */ OUTD(R2),
+  /* addr  47 */ DATA(R3, 0),    // (00000000)
+  /* addr  49 */ OUTA(R3),
+  /* addr  50 */ DATA(R3, 10),   // (00001010)
+  /* addr  52 */ OUTD(R3),
+  /* addr  53 */ DATA(R2, 1),    // (00000001)
+  /* addr  55 */ CLF,
+  /* addr  56 */ ADD(R2, R0),
+  /* addr  57 */ DATA(R2, 15),   // (00001111)
+  /* addr  59 */ CMP(R0, R2),
+  /* addr  60 */ JA(64),         // (@done)
+  /* addr  62 */ JMP(5),         // (@do)
+  /* addr  64 */ // Label 'done'
+  /* addr  64 */ HALT,
+} ;
+
+
 PROGMEM const byte prog5x5[] = {
   DATA(R0, 5),
   DATA(R1, 5),
@@ -303,7 +361,7 @@ PROGMEM const byte prog5x5[] = {
 
 
 PROGMEM const byte prog10print[] = {
-  DATA(R0, 2),
+  DATA(R0, 5),
   OUTA(R0),
   IND(R0),
   CLF,
