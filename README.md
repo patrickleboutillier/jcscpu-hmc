@@ -1,5 +1,9 @@
 # jcscpu-hmc
 
+But How Do It Know?: http://www.buthowdoitknow.com/
+
+jcscpu-hmc contains code that runs in the implementation of John Clark Scott's CPU detailed here: https://www.youtube.com/playlist?list=PLYE0XunAbwfDvfabOlNWLViRcMI54M6CR
+
 # Installation Instructions
 
 ## Install the Arduino IDE
