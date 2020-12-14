@@ -2,7 +2,7 @@
 #include "RAM.h"
 
 
-RAM::RAM(BUS *bus, void *program, int pin_MAR_s, int pin_RAM_e, int pin_RAM_s){
+RAM::RAM(BUS *bus, const void *program, int pin_MAR_s, int pin_RAM_e, int pin_RAM_s){
   _bus = bus ;
   _MAR = 0 ;
   for (int i = 0 ; i < 255 ; i++){

@@ -9,9 +9,9 @@
 #include "PROGRAMS.h"
 
 
-#define PROGRAM       progsquares // The name of the program to run. See PROGRAMS.h
+#define PROGRAM       prog42      // The name of the program to run. See PROGRAMS.h
 
-#define HZ            64          // Clock speed in HZ (1 step/sec = 4, 1 inst/sec = 24, max is about 53). Use 0 for manual clock.
+#define HZ            0           // Clock speed in HZ (1 step/sec = 4, 1 inst/sec = 24, max is about 53). Use 0 for manual clock.
 
 
 #define DEBUG_ON      0           // Global debug flag. Must be set to 1 for any debug info to show up.
@@ -20,7 +20,7 @@
 #define CLK_DEBUG     0           // Turn on CLK debug info.
 #define INST_DEBUG    0           // Turn on INST debug info.
 #define CW_DEBUG      0           // Turn on CW debug info.
-#define IO_DEBUG      1           // Turn on IO debug info.
+#define IO_DEBUG      0           // Turn on IO debug info.
 
 #define RESET_MS      1000        // Reset signal duration.
 #define INIT_WAIT_MS  1000        // Initial wait period after power-on.
