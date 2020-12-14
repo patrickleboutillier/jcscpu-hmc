@@ -5,6 +5,9 @@ But How Do It Know?: http://www.buthowdoitknow.com/
 This project contains the code that runs in the implementation of John Clark Scott's CPU detailed here: 
 https://www.youtube.com/playlist?list=PLYE0XunAbwfDvfabOlNWLViRcMI54M6CR
 
+# Project Schematic
+![](https://raw.githubusercontent.com/patrickleboutillier/jcscpu-hmc/main/jcscpu-hmc_bb.png)
+
 # Installation Instructions
 
 ## Install the Arduino IDE
