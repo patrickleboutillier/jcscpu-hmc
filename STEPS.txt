@@ -16,6 +16,8 @@
 - Comment about floppy wires
   - Bring lines to the CW area and use pull-down resistors
 
+======
+
 - CONNECT R0, R1 with all wires and pull-down resistors
 
 - "Doing something useful"
