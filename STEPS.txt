@@ -33,6 +33,7 @@
 - CONNECT IAR and IR (including IAR_s, explaining RESET)
 
 - Explain hard-wiring vs microcode
+
 - SHIFT-REGISTERS
 
 - Complete lower-part wiring for missing control signals (FLAGS_s, Ctmp_e, JCOND, IAR_s)
