@@ -16,14 +16,15 @@
 - Comment about floppy wires
   - Bring lines to the CW area and use pull-down resistors
 
-======
 
 - CONNECT R0, R1 with all wires and pull-down resistors
 
-- "Doing something useful"
-
 - CONNECT AND PROGRAM ALU ARDUINO (E2)
 - CLOCK AND STEPPER
+
+======
+
+- "Doing something useful"
 
 - CONNECT R2, R3 with all wires and pull-down resistors
 
@@ -32,6 +33,7 @@
 - CONNECT IAR and IR (including IAR_s, explaining RESET)
 
 - Explain hard-wiring vs microcode
+
 - SHIFT-REGISTERS
 
 - Complete lower-part wiring for missing control signals (FLAGS_s, Ctmp_e, JCOND, IAR_s)
