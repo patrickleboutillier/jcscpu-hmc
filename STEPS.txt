@@ -22,8 +22,6 @@
 - CONNECT AND PROGRAM ALU ARDUINO (E2)
 - CLOCK AND STEPPER
 
-======
-
 - "Doing something useful"
 
 - CONNECT R2, R3 with all wires and pull-down resistors
@@ -31,6 +29,8 @@
 - CONNECT AND PROGRAM INST ARDUINO (E3)
 
 - CONNECT IAR and IR (including IAR_s, explaining RESET)
+
+======
 
 - Explain hard-wiring vs microcode
 
