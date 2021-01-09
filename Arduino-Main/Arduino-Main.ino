@@ -112,6 +112,14 @@ void loop(){
     be |= ALU.loop(DEBUG_ON & ALU_DEBUG) ;
   }
   if (INST_PRESENT){  
+    if (RESET){
+      byte b = BUS.read() ;
+      if (b != 0){
+        Serial.print(F("SYSTEM: WARNING! Bus value is not 0 (bus:")) ; 
+        Serial.print(b) ; 
+        Serial.println(F(") during power-on reset!")) ;         
+      }
+    }
     unsigned long cw = INST.loop(RESET, CLK.clk_e(), CLK.clk_s(), CLK.step(), DEBUG_ON & INST_DEBUG) ;
     // Send cw to the shift registers.
     CW.loop(RESET, cw, DEBUG_ON & CW_DEBUG) ;
