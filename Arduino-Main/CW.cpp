@@ -27,10 +27,6 @@ void CW::loop(bool reset, unsigned long cw, bool debug = 0){
     cw = 0 ;
   }
   
-  //if (cw == _cache){
-  //  return ;
-  //}
-  
   digitalWrite(_pin_LATCH, LOW) ;
 
   if ((debug)&&(cw != _cache)){
