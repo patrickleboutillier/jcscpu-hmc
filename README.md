@@ -2,6 +2,8 @@
 
 But How Do It Know?: http://www.buthowdoitknow.com/
 
+# Video Series
+
 This project contains the code that runs in the implementation of John Clark Scott's CPU detailed here: 
 https://www.youtube.com/playlist?list=PLYE0XunAbwfDvfabOlNWLViRcMI54M6CR
 
