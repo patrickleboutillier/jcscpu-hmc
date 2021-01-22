@@ -9,7 +9,7 @@
 #include "PROGRAMS.h"
 
 
-#define PROGRAM       prog42      // The name of the program to run. See PROGRAMS.h
+#define PROGRAM       NULL        // The name of the program to run. See PROGRAMS.h
 
 #define HZ            0           // Clock speed in HZ (1 step/sec = 4, 1 inst/sec = 24, max is about 53). Use 0 for manual clock.
 
