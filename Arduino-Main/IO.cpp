@@ -91,10 +91,17 @@ byte IO::produce_byte(){
 
   switch (_cur_dev){
     case TTY:
+      if (Serial.available()){
+        ret = Serial.read() ;
+      }
+      break ;
     case TTY_NUM:
     case TTY_NUM_T:
       if (Serial.available()){
-        ret = Serial.read() ;
+        ret = Serial.read() - '0' ;
+        if ((ret < 0)||(ret > 9)){
+          ret = 0 ;
+        }
       }
       break ;
     case RNG:
@@ -114,13 +121,13 @@ void IO::consume_byte(byte b){
     case TTY_NUM:
       Serial.println(b) ;
       break ;
-    case RNG:
-      // Do nothing, RNG is output-only.
-      break ;
     case TTY_NUM_T:
       char buf[8] ;
       sprintf(buf, "%4d", b) ;
       Serial.print(buf) ;
+      break ;
+    case RNG:
+      // Do nothing, RNG is output-only.
       break ;
   }
 }
