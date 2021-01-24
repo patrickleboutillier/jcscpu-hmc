@@ -6,6 +6,7 @@
 #define TTY           0
 #define TTY_NUM       1
 #define TTY_NUM_T     2
+#define TTY_L         3
 #define RNG           5
 
 
@@ -91,6 +92,7 @@ byte IO::produce_byte(){
 
   switch (_cur_dev){
     case TTY:
+    case TTY_L:
       if (Serial.available()){
         ret = Serial.read() ;
       }
@@ -117,6 +119,9 @@ void IO::consume_byte(byte b){
   switch (_cur_dev){
     case TTY:
       Serial.print((char)b) ;
+      break ;
+      case TTY_L:
+      Serial.println((char)b) ;
       break ;
     case TTY_NUM:
       Serial.println(b) ;
