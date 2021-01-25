@@ -25,7 +25,7 @@ typedef enum Reg { R0 = 0, R1 = 1, R2 = 2, R3 = 3 } ;
 #define LD(ra, rb)        (0b00000000 | (ra << 2) | rb)
 // Store RB to RAM address in RA
 #define ST(ra, rb)        (0b00010000 | (ra << 2) | rb)
-// #define DATA(rb, data)    _DATA(rb), data
+// Store DATA byte in RB
 #define DATA(rb, data)    (0b00100000 | rb), data
 
 #define JMPR(rb)          (0b00110000 | rb)
