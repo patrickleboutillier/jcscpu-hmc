@@ -20,7 +20,7 @@ PROGMEM const byte prog42[] = {
 // Tests a conditional jump instruction, JC.
 // Adds 200 + 200.
 // If the carry bit is set, print "J" to IO device #3 and halts
-// In not, halts.
+// If not, halts.
 PROGMEM const byte progjc[] = {
   DATA(R0, 200),
   DATA(R1, 200),
@@ -152,11 +152,11 @@ PROGMEM const byte prog10print[] = {
 
 // A simple guessing game.
 // The computer will guess a number you pick between 0 and 255.
-// The computer displays a guess number
+// The computer displays a guess number, followed by "?"
 // If your number is higher, enter "h" in the Serial Monitor and press ENTER.
 // If your number is lower, enter "l" in the Serial Monitor and press ENTER.
 // If your number has been guessed, enter "=" in the Serial Monitor and press ENTER.
-// In the last casae, the computer will reply with "!" and halt.
+// In the last case, the computer will reply with "!" and halt.
 PROGMEM const byte progggame[] = {
   /* addr   0 */ // R2=min, R3=max
   /* addr   0 */ DATA(R2, 0),    // (00000000)

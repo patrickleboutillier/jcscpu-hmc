@@ -75,7 +75,6 @@ void BUS::write(byte b){
     _enabled = true ;
   }
 
-  _cache = b ;
   digitalWrite(_pin_bit7, (b >> 7) & 0x01) ;
   digitalWrite(_pin_bit6, (b >> 6) & 0x01) ;
   digitalWrite(_pin_bit5, (b >> 5) & 0x01) ;
@@ -84,4 +83,6 @@ void BUS::write(byte b){
   digitalWrite(_pin_bit2, (b >> 2) & 0x01) ;
   digitalWrite(_pin_bit1, (b >> 1) & 0x01) ;
   digitalWrite(_pin_bit0, b & 0x01) ;
+
+  _cache = b ;
 }
