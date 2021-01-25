@@ -9,4 +9,10 @@ PROGMEM const byte progtemplate[] = {
 } ;
 
 
+PROGMEM const byte progtest[] = {
+  DATA(R0, 5),
+  // ...
+  HALT,
+} ;
+
 #endif
